@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Terminal Absensi Guru</title>
+
+  <script
+    src="https://unpkg.com/html5-qrcode"
+    type="text/javascript">
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eef2f5;
+      color: #18212a;
+    }
+
+    .header {
+      background: #174c38;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .clock-area {
+      background: white;
+      border: 1px solid #d8e0e6;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    #clock {
+      font-size: 34px;
+      font-weight: bold;
+      color: #174c38;
+    }
+
+    #date {
+      margin-top: 5px;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #d8e0e6;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
+
+    #reader {
+      width: 100%;
+    }
+
+    .instruction {
+      margin-top: 15px;
+      padding: 12px;
+      background: #f4f6f8;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    #result {
+      min-height: 350px;
+      padding: 20px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .info {
+      background: #edf5fb;
+      border: 2px solid #4c83ac;
+    }
+
+    .success {
+      background: #e9f7ee;
+      border: 2px solid #2d8a52;
+    }
+
+    .warning {
+      background: #fff7e5;
+      border: 2px solid #d99100;
+    }
+
+    .error {
+      background: #fdecec;
+      border: 2px solid #b53a3a;
+    }
+
+    .icon {
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .teacher {
+      margin-top: 15px;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .details {
+      margin-top: 13px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    #setup {
+      max-width: 500px;
+      margin: 25px auto;
+      background: white;
+      border: 1px solid #d8e0e6;
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    #setup h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #bac6cf;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 13px;
+      border: 0;
+      border-radius: 8px;
+      background: #174c38;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: #6b747c;
+    }
+
+    .small {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #68747e;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 750px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>MIS DAARUL ISHLAH</h1>
+    <p>TERMINAL ABSENSI MENGAJAR GURU</p>
+  </div>
+
+
+  <!-- SETUP PERTAMA -->
+  <div id="setup">
+
+    <h2>Setup Terminal</h2>
+
+    <p>
+      Pengaturan ini cukup dilakukan sekali
+      pada komputer ruang guru.
+    </p>
+
+    <label>
+      Supabase Project Reference
+    </label>
+
+    <input
+      id="projectRefInput"
+      placeholder="contoh: abcdefghijk..."
+    >
+
+    <label>
+      Terminal Token
+    </label>
+
+    <input
+      id="terminalTokenInput"
+      type="password"
+      placeholder="TERM-XXXXXXXX..."
+    >
+
+    <button id="saveConfigBtn">
+      Simpan & Aktifkan Terminal
+    </button>
+
+    <div class="small">
+      Terminal Token hanya disimpan pada
+      browser komputer ini, tidak di GitHub.
+    </div>
+
+  </div>
+
+
+  <!-- APLIKASI TERMINAL -->
+  <div
+    id="terminal"
+    class="container hidden"
+  >
+
+    <div class="clock-area">
+
+      <div id="clock">
+        --:--:--
+      </div>
+
+      <div id="date">
+        Memuat tanggal...
+      </div>
+
+    </div>
+
+
+    <div class="grid">
+
+      <div class="panel">
+
+        <h2>
+          📷 Scan Kartu Guru
+        </h2>
+
+        <div id="reader"></div>
+
+        <div class="instruction">
+          Arahkan QR kartu guru ke kamera.
+          <br>
+          Absensi diproses otomatis.
+        </div>
+
+        <button
+          id="resetBtn"
+          class="secondary"
+        >
+          Reset Pengaturan Terminal
+        </button>
+
+      </div>
+
+
+      <div class="panel">
+
+        <h2>
+          Hasil Absensi
+        </h2>
+
+        <div
+          id="result"
+          class="info"
+        >
+
+          <div class="icon">
+            📇
+          </div>
+
+          <div class="title">
+            Terminal Siap
+          </div>
+
+          <div class="details">
+            Silakan scan kartu QR guru.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+  let PROJECT_REF = '';
+  let TERMINAL_TOKEN = '';
+
+  let scanLocked = false;
+
+  let lastToken = '';
+  let lastScanTime = 0;
+
+  const DUPLICATE_DELAY = 5000;
+
+
+  // ==========================================
+  // CONFIG
+  // ==========================================
+
+  function loadConfig() {
+
+    PROJECT_REF =
+      localStorage.getItem(
+        'absensi_project_ref'
+      ) || '';
+
+    TERMINAL_TOKEN =
+      localStorage.getItem(
+        'absensi_terminal_token'
+      ) || '';
+
+
+    if (
+      PROJECT_REF &&
+      TERMINAL_TOKEN
+    ) {
+
+      document
+        .getElementById('setup')
+        .classList
+        .add('hidden');
+
+      document
+        .getElementById('terminal')
+        .classList
+        .remove('hidden');
+
+      startScanner();
+
+    }
+
+  }
+
+
+  document
+    .getElementById('saveConfigBtn')
+    .addEventListener(
+      'click',
+      function() {
+
+        const projectRef =
+          document
+            .getElementById(
+              'projectRefInput'
+            )
+            .value
+            .trim();
+
+        const terminalToken =
+          document
+            .getElementById(
+              'terminalTokenInput'
+            )
+            .value
+            .trim();
+
+
+        if (
+          !projectRef ||
+          !terminalToken
+        ) {
+
+          alert(
+            'Project Reference dan Terminal Token wajib diisi.'
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !terminalToken.startsWith(
+            'TERM-'
+          )
+        ) {
+
+          alert(
+            'Terminal Token tidak valid.'
+          );
+
+          return;
+
+        }
+
+
+        localStorage.setItem(
+          'absensi_project_ref',
+          projectRef
+        );
+
+        localStorage.setItem(
+          'absensi_terminal_token',
+          terminalToken
+        );
+
+
+        PROJECT_REF =
+          projectRef;
+
+        TERMINAL_TOKEN =
+          terminalToken;
+
+
+        document
+          .getElementById('setup')
+          .classList
+          .add('hidden');
+
+        document
+          .getElementById('terminal')
+          .classList
+          .remove('hidden');
+
+
+        startScanner();
+
+      }
+    );
+
+
+  document
+    .getElementById('resetBtn')
+    .addEventListener(
+      'click',
+      function() {
+
+        if (
+          !confirm(
+            'Reset konfigurasi terminal?'
+          )
+        ) {
+          return;
+        }
+
+
+        localStorage.removeItem(
+          'absensi_project_ref'
+        );
+
+        localStorage.removeItem(
+          'absensi_terminal_token'
+        );
+
+        location.reload();
+
+      }
+    );
+
+
+  // ==========================================
+  // CLOCK
+  // ==========================================
+
+  function updateClock() {
+
+    const now =
+      new Date();
+
+
+    document
+      .getElementById('clock')
+      .textContent =
+        now.toLocaleTimeString(
+          'id-ID',
+          {
+            hour12: false
+          }
+        );
+
+
+    document
+      .getElementById('date')
+      .textContent =
+        now.toLocaleDateString(
+          'id-ID',
+          {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+          }
+        );
+
+  }
+
+
+  updateClock();
+
+  setInterval(
+    updateClock,
+    1000
+  );
+
+
+  // ==========================================
+  // SPEECH
+  // ==========================================
+
+  function speak(text) {
+
+    try {
+
+      if (
+        !window.speechSynthesis
+      ) {
+        return;
+      }
+
+
+      speechSynthesis.cancel();
+
+
+      const voice =
+        new SpeechSynthesisUtterance(
+          text
+        );
+
+
+      voice.lang =
+        'id-ID';
+
+      voice.rate =
+        1;
+
+
+      speechSynthesis.speak(
+        voice
+      );
+
+    } catch (e) {
+
+      console.log(e);
+
+    }
+
+  }
+
+
+  // ==========================================
+  // API
+  // ==========================================
+
+  async function processQrToken(
+    qrToken
+  ) {
+
+    const url =
+      `https://${PROJECT_REF}.supabase.co/functions/v1/terminal-api`;
+
+
+    const response =
+      await fetch(
+        url,
+        {
+          method: 'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json',
+
+            'x-terminal-token':
+              TERMINAL_TOKEN
+          },
+
+          body:
+            JSON.stringify({
+              teacher_qr_token:
+                qrToken
+            })
+        }
+      );
+
+
+    let data;
+
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch (e) {
+
+      throw new Error(
+        'Response server tidak valid.'
+      );
+
+    }
+
+
+    return data;
+
+  }
+
+
+  // ==========================================
+  // SCANNER
+  // ==========================================
+
+  let scannerStarted = false;
+
+
+  function startScanner() {
+
+    if (scannerStarted) {
+      return;
+    }
+
+
+    scannerStarted = true;
+
+
+    const scanner =
+      new Html5QrcodeScanner(
+        'reader',
+        {
+          fps: 10,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          rememberLastUsedCamera:
+            true,
+
+          supportedScanTypes: [
+            Html5QrcodeScanType
+              .SCAN_TYPE_CAMERA
+          ]
+        },
+        false
+      );
+
+
+    scanner.render(
+      onScanSuccess,
+      function() {}
+    );
+
+  }
+
+
+  async function onScanSuccess(
+    decodedText
+  ) {
+
+    const token =
+      String(
+        decodedText || ''
+      ).trim();
+
+
+    if (!token) {
+      return;
+    }
+
+
+    if (
+      !token.startsWith('TCHR-')
+    ) {
+
+      showError(
+        'QR ini bukan kartu guru.'
+      );
+
+      return;
+
+    }
+
+
+    const now =
+      Date.now();
+
+
+    if (
+      token === lastToken &&
+      (
+        now -
+        lastScanTime
+      ) <
+      DUPLICATE_DELAY
+    ) {
+
+      return;
+
+    }
+
+
+    if (scanLocked) {
+      return;
+    }
+
+
+    scanLocked = true;
+
+    lastToken =
+      token;
+
+    lastScanTime =
+      now;
+
+
+    showProcessing();
+
+
+    try {
+
+      const result =
+        await processQrToken(
+          token
+        );
+
+
+      showResult(
+        result
+      );
+
+
+    } catch (error) {
+
+      showError(
+        error.message ||
+        'Gagal terhubung ke server.'
+      );
+
+    }
+
+
+    setTimeout(
+      function() {
+
+        scanLocked =
+          false;
+
+        showReady();
+
+      },
+      4000
+    );
+
+  }
+
+
+  // ==========================================
+  // UI
+  // ==========================================
+
+  function showProcessing() {
+
+    const result =
+      document
+        .getElementById('result');
+
+
+    result.className =
+      'info';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        ⏳
+      </div>
+
+      <div class="title">
+        Memproses Absensi
+      </div>
+
+      <div class="details">
+        Mohon tunggu...
+      </div>
+
+    `;
+
+  }
+
+
+  function showReady() {
+
+    const result =
+      document
+        .getElementById('result');
+
+
+    result.className =
+      'info';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        📇
+      </div>
+
+      <div class="title">
+        Terminal Siap
+      </div>
+
+      <div class="details">
+        Silakan scan kartu QR guru.
+      </div>
+
+    `;
+
+  }
+
+
+  function showError(message) {
+
+    const result =
+      document
+        .getElementById('result');
+
+
+    result.className =
+      'error';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        ❌
+      </div>
+
+      <div class="title">
+        ABSENSI GAGAL
+      </div>
+
+      <div class="details">
+        ${escapeHtml(message)}
+      </div>
+
+    `;
+
+
+    speak(
+      'Absensi gagal.'
+    );
+
+  }
+
+
+  function showResult(data) {
+
+    if (
+      !data ||
+      data.success === false
+    ) {
+
+      showError(
+        data?.message ||
+        'Absensi gagal.'
+      );
+
+      return;
+
+    }
+
+
+    if (data.duplicate) {
+
+      const result =
+        document
+          .getElementById('result');
+
+
+      result.className =
+        'info';
+
+
+      result.innerHTML = `
+
+        <div class="icon">
+          ℹ️
+        </div>
+
+        <div class="title">
+          SUDAH TERCATAT
+        </div>
+
+        <div class="teacher">
+          ${escapeHtml(
+            data.teacher?.name || ''
+          )}
+        </div>
+
+        <div class="details">
+          Absensi jadwal ini
+          sudah tersimpan.
+        </div>
+
+      `;
+
+
+      speak(
+        'Absensi sudah tercatat.'
+      );
+
+      return;
+
+    }
+
+
+    const attendance =
+      data.attendance || {};
+
+
+    const isLate =
+      attendance.status ===
+      'terlambat';
+
+
+    const result =
+      document
+        .getElementById('result');
+
+
+    result.className =
+      isLate
+        ? 'warning'
+        : 'success';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        ${isLate ? '⚠️' : '✅'}
+      </div>
+
+
+      <div class="title">
+        ABSENSI BERHASIL
+      </div>
+
+
+      <div class="teacher">
+
+        ${escapeHtml(
+          data.teacher?.name || ''
+        )}
+
+      </div>
+
+
+      <div class="details">
+
+        <strong>
+          ${escapeHtml(
+            data.schedule
+              ?.subject
+              ?.subject_name || ''
+          )}
+        </strong>
+
+        <br>
+
+        ${escapeHtml(
+          data.schedule
+            ?.class
+            ?.class_name || ''
+        )}
+
+        <br><br>
+
+        Jadwal:
+        ${formatTime(
+          data.schedule
+            ?.start_time
+        )}
+        -
+        ${formatTime(
+          data.schedule
+            ?.end_time
+        )}
+
+        <br>
+
+        Scan:
+        ${escapeHtml(
+          attendance.time || ''
+        )}
+
+        <br>
+
+        Status:
+        <strong>
+          ${escapeHtml(
+            attendance
+              .status_label || ''
+          )}
+        </strong>
+
+        ${
+          attendance.late_minutes > 0
+            ? `
+              <br>
+              Terlambat:
+              <strong>
+                ${attendance.late_minutes}
+                menit
+              </strong>
+            `
+            : ''
+        }
+
+      </div>
+
+    `;
+
+
+    if (isLate) {
+
+      speak(
+        'Absensi berhasil. Anda terlambat.'
+      );
+
+    } else {
+
+      speak(
+        'Absensi berhasil.'
+      );
+
+    }
+
+  }
+
+
+  function formatTime(value) {
+
+    if (!value) {
+      return '-';
+    }
+
+    return String(value)
+      .substring(0, 5);
+
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+  // ==========================================
+  // INITIALIZE
+  // ==========================================
+
+  loadConfig();
+
+</script>
+
+</body>
+</html>
