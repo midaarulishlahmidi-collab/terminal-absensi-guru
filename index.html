@@ -11,12 +11,14 @@
 
   <title>Terminal Absensi Guru</title>
 
+  <!-- Library scanner QR -->
   <script
     src="https://unpkg.com/html5-qrcode"
     type="text/javascript">
   </script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -31,26 +33,104 @@
     .header {
       background: #174c38;
       color: white;
-      padding: 18px;
+      padding: 20px;
       text-align: center;
     }
 
     .header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 25px;
     }
 
     .header p {
-      margin: 5px 0 0;
+      margin: 7px 0 0;
       font-size: 13px;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
 
     .container {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 20px auto;
       padding: 0 16px;
     }
+
+    /* =========================
+       SETUP TERMINAL
+       ========================= */
+
+    #setup {
+      max-width: 520px;
+      margin: 30px auto;
+      background: white;
+      border: 1px solid #d8e0e6;
+      border-radius: 14px;
+      padding: 25px;
+    }
+
+    #setup h2 {
+      margin-top: 0;
+      color: #174c38;
+    }
+
+    #setup p {
+      color: #63707a;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      font-size: 16px;
+      border: 1px solid #bbc6ce;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #174c38;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .main-button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      color: white;
+      background: #174c38;
+    }
+
+    .secondary-button {
+      margin-top: 14px;
+      width: 100%;
+      padding: 11px;
+      background: #69747c;
+      color: white;
+    }
+
+    .small-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #707b84;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       TERMINAL
+       ========================= */
 
     .clock-area {
       background: white;
@@ -58,11 +138,11 @@
       border-radius: 12px;
       padding: 15px;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     #clock {
-      font-size: 34px;
+      font-size: 38px;
       font-weight: bold;
       color: #174c38;
     }
@@ -70,6 +150,13 @@
     #date {
       margin-top: 5px;
       font-size: 16px;
+      color: #58646d;
+    }
+
+    .terminal-name {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #66737c;
     }
 
     .grid {
@@ -83,34 +170,41 @@
       border: 1px solid #d8e0e6;
       border-radius: 14px;
       padding: 18px;
+      min-width: 0;
     }
 
     .panel h2 {
-      margin-top: 0;
+      margin: 0 0 15px 0;
       font-size: 19px;
+      color: #24313a;
     }
 
     #reader {
       width: 100%;
+      overflow: hidden;
+      border-radius: 10px;
     }
 
     .instruction {
       margin-top: 15px;
-      padding: 12px;
+      padding: 13px;
       background: #f4f6f8;
       border-radius: 8px;
       text-align: center;
-      font-size: 14px;
+      color: #58646e;
+      line-height: 1.5;
     }
 
     #result {
-      min-height: 350px;
-      padding: 20px;
+      min-height: 380px;
+      padding: 24px;
       border-radius: 12px;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       text-align: center;
     }
 
@@ -135,144 +229,162 @@
     }
 
     .icon {
-      font-size: 55px;
-      margin-bottom: 10px;
+      font-size: 60px;
+      margin-bottom: 12px;
     }
 
-    .title {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .teacher {
-      margin-top: 15px;
+    .result-title {
       font-size: 25px;
       font-weight: bold;
     }
 
-    .details {
-      margin-top: 13px;
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
-    #setup {
-      max-width: 500px;
-      margin: 25px auto;
-      background: white;
-      border: 1px solid #d8e0e6;
-      border-radius: 14px;
-      padding: 22px;
-    }
-
-    #setup h2 {
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      margin-top: 14px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #bac6cf;
-      border-radius: 8px;
-    }
-
-    button {
+    .teacher-name {
       margin-top: 18px;
-      width: 100%;
-      padding: 13px;
-      border: 0;
-      border-radius: 8px;
-      background: #174c38;
-      color: white;
-      font-size: 16px;
+      font-size: 27px;
       font-weight: bold;
-      cursor: pointer;
+      color: #17212a;
     }
 
-    .secondary {
-      background: #6b747c;
+    .details {
+      margin-top: 15px;
+      line-height: 1.8;
+      font-size: 16px;
     }
 
-    .small {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #68747e;
+    .status-text {
+      font-size: 20px;
+      font-weight: bold;
     }
 
     .hidden {
       display: none !important;
     }
 
-    @media (max-width: 750px) {
+    .server-status {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: #71808a;
+    }
+
+    @media (max-width: 780px) {
+
       .grid {
         grid-template-columns: 1fr;
       }
+
+      #clock {
+        font-size: 32px;
+      }
+
+      .header h1 {
+        font-size: 21px;
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+  <!-- ======================================
+       HEADER
+       ====================================== -->
+
   <div class="header">
-    <h1>MIS DAARUL ISHLAH</h1>
-    <p>TERMINAL ABSENSI MENGAJAR GURU</p>
+
+    <h1>
+      MIS DAARUL ISHLAH
+    </h1>
+
+    <p>
+      TERMINAL ABSENSI MENGAJAR GURU
+    </p>
+
   </div>
 
 
-  <!-- SETUP PERTAMA -->
+  <!-- ======================================
+       SETUP PERTAMA
+       ====================================== -->
+
   <div id="setup">
 
-    <h2>Setup Terminal</h2>
+    <h2>
+      Setup Terminal Ruang Guru
+    </h2>
 
     <p>
-      Pengaturan ini cukup dilakukan sekali
-      pada komputer ruang guru.
+      Pengaturan ini hanya dilakukan sekali
+      pada komputer yang digunakan sebagai
+      terminal absensi.
     </p>
 
-    <label>
+
+    <label for="projectRefInput">
       Supabase Project Reference
     </label>
 
     <input
       id="projectRefInput"
-      placeholder="contoh: abcdefghijk..."
+      type="text"
+      autocomplete="off"
+      placeholder="contoh: abcdefghijklmnop"
     >
 
-    <label>
+
+    <label for="terminalTokenInput">
       Terminal Token
     </label>
 
     <input
       id="terminalTokenInput"
       type="password"
-      placeholder="TERM-XXXXXXXX..."
+      autocomplete="off"
+      placeholder="TERM-XXXXXXXXXXXXXXXX"
     >
 
-    <button id="saveConfigBtn">
+
+    <button
+      id="saveConfigBtn"
+      class="main-button"
+      type="button"
+    >
       Simpan & Aktifkan Terminal
     </button>
 
-    <div class="small">
-      Terminal Token hanya disimpan pada
-      browser komputer ini, tidak di GitHub.
+
+    <div class="small-note">
+
+      Masukkan hanya Project Reference
+      dan Terminal Token.
+
+      <br><br>
+
+      Jangan pernah memasukkan
+      Supabase Secret Key,
+      GAS Gateway Secret,
+      atau Management Token
+      pada halaman ini.
+
     </div>
 
   </div>
 
 
-  <!-- APLIKASI TERMINAL -->
+  <!-- ======================================
+       TERMINAL
+       ====================================== -->
+
   <div
     id="terminal"
     class="container hidden"
   >
+
+    <!-- JAM -->
 
     <div class="clock-area">
 
@@ -284,28 +396,58 @@
         Memuat tanggal...
       </div>
 
+      <div
+        id="terminalInfo"
+        class="terminal-name"
+      >
+        Terminal Ruang Guru
+      </div>
+
     </div>
 
 
     <div class="grid">
 
+
+      <!-- ====================================
+           CAMERA
+           ==================================== -->
+
       <div class="panel">
 
         <h2>
-          📷 Scan Kartu Guru
+          📷 Scan Kartu QR Guru
         </h2>
+
 
         <div id="reader"></div>
 
+
         <div class="instruction">
-          Arahkan QR kartu guru ke kamera.
+
+          Arahkan kartu QR guru
+          ke kamera komputer.
+
           <br>
-          Absensi diproses otomatis.
+
+          Sistem akan membaca kartu
+          secara otomatis.
+
         </div>
+
+
+        <div
+          id="cameraStatus"
+          class="server-status"
+        >
+          Menyiapkan kamera...
+        </div>
+
 
         <button
           id="resetBtn"
-          class="secondary"
+          class="secondary-button"
+          type="button"
         >
           Reset Pengaturan Terminal
         </button>
@@ -313,11 +455,16 @@
       </div>
 
 
+      <!-- ====================================
+           RESULT
+           ==================================== -->
+
       <div class="panel">
 
         <h2>
           Hasil Absensi
         </h2>
+
 
         <div
           id="result"
@@ -328,8 +475,8 @@
             📇
           </div>
 
-          <div class="title">
-            Terminal Siap
+          <div class="result-title">
+            TERMINAL SIAP
           </div>
 
           <div class="details">
@@ -340,12 +487,17 @@
 
       </div>
 
+
     </div>
 
   </div>
 
 
 <script>
+
+  // ==================================================
+  // KONFIGURASI
+  // ==================================================
 
   let PROJECT_REF = '';
   let TERMINAL_TOKEN = '';
@@ -355,12 +507,14 @@
   let lastToken = '';
   let lastScanTime = 0;
 
+  let scannerStarted = false;
+
   const DUPLICATE_DELAY = 5000;
 
 
-  // ==========================================
-  // CONFIG
-  // ==========================================
+  // ==================================================
+  // LOAD CONFIG
+  // ==================================================
 
   function loadConfig() {
 
@@ -380,15 +534,7 @@
       TERMINAL_TOKEN
     ) {
 
-      document
-        .getElementById('setup')
-        .classList
-        .add('hidden');
-
-      document
-        .getElementById('terminal')
-        .classList
-        .remove('hidden');
+      showTerminal();
 
       startScanner();
 
@@ -397,8 +543,14 @@
   }
 
 
+  // ==================================================
+  // SAVE CONFIG
+  // ==================================================
+
   document
-    .getElementById('saveConfigBtn')
+    .getElementById(
+      'saveConfigBtn'
+    )
     .addEventListener(
       'click',
       function() {
@@ -411,6 +563,7 @@
             .value
             .trim();
 
+
         const terminalToken =
           document
             .getElementById(
@@ -420,13 +573,21 @@
             .trim();
 
 
-        if (
-          !projectRef ||
-          !terminalToken
-        ) {
+        if (!projectRef) {
 
           alert(
-            'Project Reference dan Terminal Token wajib diisi.'
+            'Supabase Project Reference wajib diisi.'
+          );
+
+          return;
+
+        }
+
+
+        if (!terminalToken) {
+
+          alert(
+            'Terminal Token wajib diisi.'
           );
 
           return;
@@ -441,7 +602,7 @@
         ) {
 
           alert(
-            'Terminal Token tidak valid.'
+            'Terminal Token tidak valid. Token harus diawali TERM-.'
           );
 
           return;
@@ -453,6 +614,7 @@
           'absensi_project_ref',
           projectRef
         );
+
 
         localStorage.setItem(
           'absensi_terminal_token',
@@ -467,16 +629,7 @@
           terminalToken;
 
 
-        document
-          .getElementById('setup')
-          .classList
-          .add('hidden');
-
-        document
-          .getElementById('terminal')
-          .classList
-          .remove('hidden');
-
+        showTerminal();
 
         startScanner();
 
@@ -484,17 +637,53 @@
     );
 
 
+  // ==================================================
+  // SHOW TERMINAL
+  // ==================================================
+
+  function showTerminal() {
+
+    document
+      .getElementById(
+        'setup'
+      )
+      .classList
+      .add(
+        'hidden'
+      );
+
+
+    document
+      .getElementById(
+        'terminal'
+      )
+      .classList
+      .remove(
+        'hidden'
+      );
+
+  }
+
+
+  // ==================================================
+  // RESET CONFIG
+  // ==================================================
+
   document
-    .getElementById('resetBtn')
+    .getElementById(
+      'resetBtn'
+    )
     .addEventListener(
       'click',
       function() {
 
-        if (
-          !confirm(
-            'Reset konfigurasi terminal?'
-          )
-        ) {
+        const ok =
+          confirm(
+            'Apakah Anda yakin ingin mereset konfigurasi terminal ini?'
+          );
+
+
+        if (!ok) {
           return;
         }
 
@@ -503,9 +692,11 @@
           'absensi_project_ref'
         );
 
+
         localStorage.removeItem(
           'absensi_terminal_token'
         );
+
 
         location.reload();
 
@@ -513,9 +704,9 @@
     );
 
 
-  // ==========================================
-  // CLOCK
-  // ==========================================
+  // ==================================================
+  // JAM & TANGGAL
+  // ==================================================
 
   function updateClock() {
 
@@ -524,7 +715,9 @@
 
 
     document
-      .getElementById('clock')
+      .getElementById(
+        'clock'
+      )
       .textContent =
         now.toLocaleTimeString(
           'id-ID',
@@ -535,7 +728,9 @@
 
 
     document
-      .getElementById('date')
+      .getElementById(
+        'date'
+      )
       .textContent =
         now.toLocaleDateString(
           'id-ID',
@@ -552,15 +747,16 @@
 
   updateClock();
 
+
   setInterval(
     updateClock,
     1000
   );
 
 
-  // ==========================================
-  // SPEECH
-  // ==========================================
+  // ==================================================
+  // SUARA
+  // ==================================================
 
   function speak(text) {
 
@@ -573,66 +769,87 @@
       }
 
 
-      speechSynthesis.cancel();
+      window
+        .speechSynthesis
+        .cancel();
 
 
-      const voice =
+      const speech =
         new SpeechSynthesisUtterance(
           text
         );
 
 
-      voice.lang =
+      speech.lang =
         'id-ID';
 
-      voice.rate =
+
+      speech.rate =
         1;
 
 
-      speechSynthesis.speak(
-        voice
+      window
+        .speechSynthesis
+        .speak(
+          speech
+        );
+
+    }
+    catch (error) {
+
+      console.log(
+        'Speech tidak tersedia.',
+        error
       );
-
-    } catch (e) {
-
-      console.log(e);
 
     }
 
   }
 
 
-  // ==========================================
-  // API
-  // ==========================================
+  // ==================================================
+  // API SUPABASE TERMINAL
+  // ==================================================
 
   async function processQrToken(
     qrToken
   ) {
 
     const url =
-      `https://${PROJECT_REF}.supabase.co/functions/v1/terminal-api`;
+      'https://' +
+      PROJECT_REF +
+      '.supabase.co/functions/v1/terminal-api';
 
 
     const response =
       await fetch(
         url,
         {
-          method: 'POST',
+
+          method:
+            'POST',
 
           headers: {
+
             'Content-Type':
               'application/json',
 
             'x-terminal-token':
               TERMINAL_TOKEN
+
           },
 
+
           body:
-            JSON.stringify({
-              teacher_qr_token:
-                qrToken
-            })
+            JSON.stringify(
+              {
+
+                teacher_qr_token:
+                  qrToken
+
+              }
+            )
+
         }
       );
 
@@ -645,10 +862,24 @@
       data =
         await response.json();
 
-    } catch (e) {
+    }
+    catch (error) {
 
       throw new Error(
-        'Response server tidak valid.'
+        'Response dari server tidak valid.'
+      );
+
+    }
+
+
+    if (
+      !response.ok &&
+      !data
+    ) {
+
+      throw new Error(
+        'Server mengembalikan HTTP ' +
+        response.status
       );
 
     }
@@ -659,12 +890,9 @@
   }
 
 
-  // ==========================================
-  // SCANNER
-  // ==========================================
-
-  let scannerStarted = false;
-
+  // ==================================================
+  // START CAMERA
+  // ==================================================
 
   function startScanner() {
 
@@ -673,48 +901,96 @@
     }
 
 
-    scannerStarted = true;
+    if (
+      typeof Html5QrcodeScanner ===
+      'undefined'
+    ) {
+
+      showError(
+        'Library scanner QR gagal dimuat. Periksa koneksi internet.'
+      );
+
+      return;
+
+    }
+
+
+    scannerStarted =
+      true;
 
 
     const scanner =
       new Html5QrcodeScanner(
         'reader',
         {
-          fps: 10,
+
+          fps:
+            10,
+
 
           qrbox: {
-            width: 250,
-            height: 250
+            width:
+              250,
+
+            height:
+              250
           },
+
 
           rememberLastUsedCamera:
             true,
 
+
           supportedScanTypes: [
+
             Html5QrcodeScanType
               .SCAN_TYPE_CAMERA
+
           ]
+
         },
         false
       );
 
 
     scanner.render(
+
       onScanSuccess,
-      function() {}
+
+      function() {
+
+        // Error pembacaan setiap frame
+        // sengaja tidak ditampilkan.
+
+      }
+
     );
+
+
+    document
+      .getElementById(
+        'cameraStatus'
+      )
+      .textContent =
+        'Scanner aktif. Jika browser meminta izin kamera, pilih Izinkan.';
 
   }
 
 
+  // ==================================================
+  // QR BERHASIL DIBACA
+  // ==================================================
+
   async function onScanSuccess(
-    decodedText
+    decodedText,
+    decodedResult
   ) {
 
     const token =
       String(
         decodedText || ''
-      ).trim();
+      )
+      .trim();
 
 
     if (!token) {
@@ -722,12 +998,15 @@
     }
 
 
+    // QR harus kartu guru
     if (
-      !token.startsWith('TCHR-')
+      !token.startsWith(
+        'TCHR-'
+      )
     ) {
 
       showError(
-        'QR ini bukan kartu guru.'
+        'QR yang dipindai bukan kartu QR guru.'
       );
 
       return;
@@ -739,6 +1018,8 @@
       Date.now();
 
 
+    // Mencegah QR sama dibaca
+    // berulang sangat cepat.
     if (
       token === lastToken &&
       (
@@ -758,10 +1039,13 @@
     }
 
 
-    scanLocked = true;
+    scanLocked =
+      true;
+
 
     lastToken =
       token;
+
 
     lastScanTime =
       now;
@@ -782,8 +1066,8 @@
         result
       );
 
-
-    } catch (error) {
+    }
+    catch (error) {
 
       showError(
         error.message ||
@@ -808,15 +1092,17 @@
   }
 
 
-  // ==========================================
-  // UI
-  // ==========================================
+  // ==================================================
+  // PROCESSING
+  // ==================================================
 
   function showProcessing() {
 
     const result =
       document
-        .getElementById('result');
+        .getElementById(
+          'result'
+        );
 
 
     result.className =
@@ -829,8 +1115,8 @@
         ⏳
       </div>
 
-      <div class="title">
-        Memproses Absensi
+      <div class="result-title">
+        MEMPROSES ABSENSI
       </div>
 
       <div class="details">
@@ -842,11 +1128,17 @@
   }
 
 
+  // ==================================================
+  // READY
+  // ==================================================
+
   function showReady() {
 
     const result =
       document
-        .getElementById('result');
+        .getElementById(
+          'result'
+        );
 
 
     result.className =
@@ -859,8 +1151,8 @@
         📇
       </div>
 
-      <div class="title">
-        Terminal Siap
+      <div class="result-title">
+        TERMINAL SIAP
       </div>
 
       <div class="details">
@@ -872,11 +1164,19 @@
   }
 
 
-  function showError(message) {
+  // ==================================================
+  // ERROR
+  // ==================================================
+
+  function showError(
+    message
+  ) {
 
     const result =
       document
-        .getElementById('result');
+        .getElementById(
+          'result'
+        );
 
 
     result.className =
@@ -889,12 +1189,16 @@
         ❌
       </div>
 
-      <div class="title">
+      <div class="result-title">
         ABSENSI GAGAL
       </div>
 
       <div class="details">
-        ${escapeHtml(message)}
+
+        ${escapeHtml(
+          message
+        )}
+
       </div>
 
     `;
@@ -907,15 +1211,31 @@
   }
 
 
-  function showResult(data) {
+  // ==================================================
+  // RESULT
+  // ==================================================
+
+  function showResult(
+    data
+  ) {
+
+    if (!data) {
+
+      showError(
+        'Server tidak memberikan response.'
+      );
+
+      return;
+
+    }
+
 
     if (
-      !data ||
       data.success === false
     ) {
 
       showError(
-        data?.message ||
+        data.message ||
         'Absensi gagal.'
       );
 
@@ -924,11 +1244,19 @@
     }
 
 
-    if (data.duplicate) {
+    // ==============================================
+    // DUPLICATE
+    // ==============================================
+
+    if (
+      data.duplicate
+    ) {
 
       const result =
         document
-          .getElementById('result');
+          .getElementById(
+            'result'
+          );
 
 
       result.className =
@@ -941,19 +1269,28 @@
           ℹ️
         </div>
 
-        <div class="title">
-          SUDAH TERCATAT
+        <div class="result-title">
+          ABSENSI SUDAH TERCATAT
         </div>
 
-        <div class="teacher">
+
+        <div class="teacher-name">
+
           ${escapeHtml(
-            data.teacher?.name || ''
+            data.teacher &&
+            data.teacher.name
+              ? data.teacher.name
+              : ''
           )}
+
         </div>
+
 
         <div class="details">
-          Absensi jadwal ini
-          sudah tersimpan.
+
+          Jadwal mengajar ini
+          sudah tercatat sebelumnya.
+
         </div>
 
       `;
@@ -963,13 +1300,34 @@
         'Absensi sudah tercatat.'
       );
 
+
       return;
 
     }
 
 
+    // ==============================================
+    // ABSENSI BERHASIL
+    // ==============================================
+
     const attendance =
       data.attendance || {};
+
+
+    const schedule =
+      data.schedule || {};
+
+
+    const teacher =
+      data.teacher || {};
+
+
+    const subject =
+      schedule.subject || {};
+
+
+    const classData =
+      schedule.class || {};
 
 
     const isLate =
@@ -979,7 +1337,9 @@
 
     const result =
       document
-        .getElementById('result');
+        .getElementById(
+          'result'
+        );
 
 
     result.className =
@@ -991,19 +1351,24 @@
     result.innerHTML = `
 
       <div class="icon">
-        ${isLate ? '⚠️' : '✅'}
+
+        ${isLate
+          ? '⚠️'
+          : '✅'
+        }
+
       </div>
 
 
-      <div class="title">
+      <div class="result-title">
         ABSENSI BERHASIL
       </div>
 
 
-      <div class="teacher">
+      <div class="teacher-name">
 
         ${escapeHtml(
-          data.teacher?.name || ''
+          teacher.name || ''
         )}
 
       </div>
@@ -1013,61 +1378,81 @@
 
         <strong>
           ${escapeHtml(
-            data.schedule
-              ?.subject
-              ?.subject_name || ''
+            subject.subject_name || ''
           )}
         </strong>
 
         <br>
 
         ${escapeHtml(
-          data.schedule
-            ?.class
-            ?.class_name || ''
+          classData.class_name || ''
         )}
+
 
         <br><br>
 
+
         Jadwal:
-        ${formatTime(
-          data.schedule
-            ?.start_time
-        )}
-        -
-        ${formatTime(
-          data.schedule
-            ?.end_time
-        )}
 
-        <br>
-
-        Scan:
-        ${escapeHtml(
-          attendance.time || ''
-        )}
-
-        <br>
-
-        Status:
         <strong>
-          ${escapeHtml(
-            attendance
-              .status_label || ''
+
+          ${formatTime(
+            schedule.start_time
           )}
+
+          -
+
+          ${formatTime(
+            schedule.end_time
+          )}
+
         </strong>
+
+
+        <br>
+
+
+        Waktu Scan:
+
+        <strong>
+
+          ${escapeHtml(
+            attendance.time || ''
+          )}
+
+        </strong>
+
+
+        <br><br>
+
+
+        <span class="status-text">
+
+          ${escapeHtml(
+            attendance.status_label || ''
+          )}
+
+        </span>
+
 
         ${
           attendance.late_minutes > 0
+
             ? `
+
               <br>
-              Terlambat:
+
+              Keterlambatan:
+
               <strong>
                 ${attendance.late_minutes}
                 menit
               </strong>
+
             `
+
             : ''
+
         }
 
       </div>
@@ -1081,7 +1466,8 @@
         'Absensi berhasil. Anda terlambat.'
       );
 
-    } else {
+    }
+    else {
 
       speak(
         'Absensi berhasil.'
@@ -1092,37 +1478,80 @@
   }
 
 
-  function formatTime(value) {
+  // ==================================================
+  // FORMAT TIME
+  // ==================================================
+
+  function formatTime(
+    value
+  ) {
 
     if (!value) {
       return '-';
     }
 
-    return String(value)
-      .substring(0, 5);
+
+    return String(
+      value
+    )
+      .substring(
+        0,
+        5
+      );
 
   }
 
 
-  function escapeHtml(value) {
+  // ==================================================
+  // ESCAPE HTML
+  // ==================================================
 
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value == null
+        ? ''
+        : value
+    )
+
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
 
   }
 
 
-  // ==========================================
-  // INITIALIZE
-  // ==========================================
+  // ==================================================
+  // START
+  // ==================================================
 
   loadConfig();
 
 </script>
 
 </body>
+
 </html>
