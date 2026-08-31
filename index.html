@@ -1211,164 +1211,131 @@
   }
 
 
-  // ==================================================
-  // RESULT
-  // ==================================================
+// ==================================================
+// RESULT
+// ==================================================
 
-  function showResult(
-    data
-  ) {
+function showResult(data) {
 
-    if (!data) {
+  if (!data) {
 
-      showError(
-        'Server tidak memberikan response.'
-      );
+    showError(
+      'Server tidak memberikan response.'
+    );
 
-      return;
-
-    }
+    return;
+  }
 
 
-    if (
-      data.success === false
-    ) {
+  // ==============================================
+  // ERROR DARI SERVER
+  // ==============================================
 
-      showError(
-        data.message ||
-        'Absensi gagal.'
-      );
+  if (data.success === false) {
 
-      return;
+    showError(
+      data.message ||
+      'Absensi gagal.'
+    );
 
-    }
-
-
-    // ==============================================
-    // DUPLICATE
-    // ==============================================
-
-    if (
-      data.duplicate
-    ) {
-
-      const result =
-        document
-          .getElementById(
-            'result'
-          );
+    return;
+  }
 
 
-      result.className =
-        'info';
+  /*
+   * Backend recordAttendance versi baru
+   * menyimpan hasil utama di dalam data.data.
+   *
+   * Fallback "|| data" dibuat agar tetap
+   * kompatibel dengan response versi lama.
+   */
+
+  const payload =
+    data.data || data;
 
 
-      result.innerHTML = `
-
-        <div class="icon">
-          ℹ️
-        </div>
-
-        <div class="result-title">
-          ABSENSI SUDAH TERCATAT
-        </div>
+  const attendance =
+    payload.attendance || {};
 
 
-        <div class="teacher-name">
-
-          ${escapeHtml(
-            data.teacher &&
-            data.teacher.name
-              ? data.teacher.name
-              : ''
-          )}
-
-        </div>
+  const schedule =
+    payload.schedule || {};
 
 
-        <div class="details">
-
-          Jadwal mengajar ini
-          sudah tercatat sebelumnya.
-
-        </div>
-
-      `;
+  const teacher =
+    payload.teacher || {};
 
 
-      speak(
-        'Absensi sudah tercatat.'
-      );
+  const subject =
+    schedule.subject || {};
 
 
-      return;
-
-    }
-
-
-    // ==============================================
-    // ABSENSI BERHASIL
-    // ==============================================
-
-    const attendance =
-      data.attendance || {};
+  const classData =
+    schedule.class || {};
 
 
-    const schedule =
-      data.schedule || {};
+  const originalTeacher =
+    schedule.original_teacher || {};
 
 
-    const teacher =
-      data.teacher || {};
+  const isSubstitute =
+    payload.is_substitute === true ||
+    schedule.is_substitute === true ||
+    attendance.status === 'pengganti';
 
 
-    const subject =
-      schedule.subject || {};
+  const timingStatus =
+    payload.timing_status ||
+    attendance.status ||
+    '';
 
 
-    const classData =
-      schedule.class || {};
+  const timingMessage =
+    payload.timing_message ||
+    (
+      attendance.status === 'pengganti'
+        ? 'Guru Pengganti'
+        : attendance.status || ''
+    );
 
 
-    const isLate =
-      attendance.status ===
-      'terlambat';
+  const isLate =
+    timingStatus === 'terlambat';
 
+
+  // ==============================================
+  // DUPLIKAT
+  // ==============================================
+
+  if (data.duplicate) {
 
     const result =
-      document
-        .getElementById(
-          'result'
-        );
+      document.getElementById(
+        'result'
+      );
 
 
     result.className =
-      isLate
-        ? 'warning'
-        : 'success';
+      'info';
 
 
     result.innerHTML = `
 
       <div class="icon">
-
-        ${isLate
-          ? '⚠️'
-          : '✅'
-        }
-
+        ℹ️
       </div>
 
-
       <div class="result-title">
-        ABSENSI BERHASIL
+        ABSENSI SUDAH TERCATAT
       </div>
 
 
       <div class="teacher-name">
 
         ${escapeHtml(
-          teacher.name || ''
+          teacher.full_name ||
+          teacher.name ||
+          ''
         )}
 
       </div>
@@ -1376,11 +1343,9 @@
 
       <div class="details">
 
-        <strong>
-          ${escapeHtml(
-            subject.subject_name || ''
-          )}
-        </strong>
+        ${escapeHtml(
+          subject.subject_name || ''
+        )}
 
         <br>
 
@@ -1388,9 +1353,7 @@
           classData.class_name || ''
         )}
 
-
         <br><br>
-
 
         Jadwal:
 
@@ -1408,74 +1371,313 @@
 
         </strong>
 
-
-        <br>
-
-
-        Waktu Scan:
-
-        <strong>
-
-          ${escapeHtml(
-            attendance.time || ''
-          )}
-
-        </strong>
-
-
         <br><br>
 
-
-        <span class="status-text">
-
-          ${escapeHtml(
-            attendance.status_label || ''
-          )}
-
-        </span>
-
-
-        ${
-          attendance.late_minutes > 0
-
-            ? `
-
-              <br>
-
-              Keterlambatan:
-
-              <strong>
-                ${attendance.late_minutes}
-                menit
-              </strong>
-
-            `
-
-            : ''
-
-        }
+        Jadwal mengajar ini sudah
+        tercatat sebelumnya.
 
       </div>
 
     `;
 
 
-    if (isLate) {
+    speak(
+      'Absensi sudah tercatat.'
+    );
 
-      speak(
-        'Absensi berhasil. Anda terlambat.'
-      );
 
-    }
-    else {
+    return;
+  }
 
-      speak(
-        'Absensi berhasil.'
-      );
 
-    }
+  // ==============================================
+  // ABSENSI BERHASIL
+  // ==============================================
+
+  const result =
+    document.getElementById(
+      'result'
+    );
+
+
+  result.className =
+    isLate
+      ? 'warning'
+      : 'success';
+
+
+  // ==============================================
+  // LABEL STATUS
+  // ==============================================
+
+  let mainStatus = '';
+
+  if (isSubstitute) {
+
+    mainStatus =
+      'GURU PENGGANTI';
 
   }
+  else {
+
+    mainStatus =
+      timingMessage
+        ? String(
+            timingMessage
+          ).toUpperCase()
+        : 'ABSENSI BERHASIL';
+
+  }
+
+
+  // ==============================================
+  // INFO GURU ASLI JIKA PENGGANTI
+  // ==============================================
+
+  let substituteInfo = '';
+
+
+  if (isSubstitute) {
+
+    substituteInfo = `
+
+      <div
+        style="
+          margin-top:12px;
+          padding:10px 14px;
+          background:#fff7e5;
+          border-radius:8px;
+          font-size:14px;
+        "
+      >
+
+        <strong>
+          GURU PENGGANTI
+        </strong>
+
+        ${
+          originalTeacher.full_name
+            ? `
+
+              <br>
+
+              Menggantikan:
+
+              <strong>
+                ${escapeHtml(
+                  originalTeacher.full_name
+                )}
+              </strong>
+
+            `
+            : ''
+        }
+
+      </div>
+
+    `;
+
+  }
+
+
+  // ==============================================
+  // TAMPILKAN HASIL
+  // ==============================================
+
+  result.innerHTML = `
+
+    <div class="icon">
+
+      ${
+        isSubstitute
+          ? '🔄'
+          : (
+              isLate
+                ? '⚠️'
+                : '✅'
+            )
+      }
+
+    </div>
+
+
+    <div class="result-title">
+
+      ${
+        isSubstitute
+          ? 'ABSENSI PENGGANTI BERHASIL'
+          : 'ABSENSI BERHASIL'
+      }
+
+    </div>
+
+
+    <div class="teacher-name">
+
+      ${escapeHtml(
+        teacher.full_name ||
+        teacher.name ||
+        ''
+      )}
+
+    </div>
+
+
+    ${substituteInfo}
+
+
+    <div class="details">
+
+
+      <strong>
+
+        ${escapeHtml(
+          subject.subject_name || '-'
+        )}
+
+      </strong>
+
+
+      <br>
+
+
+      ${escapeHtml(
+        classData.class_name || '-'
+      )}
+
+
+      <br><br>
+
+
+      Jadwal:
+
+      <strong>
+
+        ${formatTime(
+          schedule.start_time
+        )}
+
+        -
+
+        ${formatTime(
+          schedule.end_time
+        )}
+
+      </strong>
+
+
+      <br>
+
+
+      Waktu Scan:
+
+      <strong>
+
+        ${formatTime(
+          attendance.scan_time ||
+          attendance.time
+        )}
+
+      </strong>
+
+
+      <br><br>
+
+
+      <span class="status-text">
+
+        ${escapeHtml(
+          mainStatus
+        )}
+
+      </span>
+
+
+      ${
+        isSubstitute &&
+        timingMessage
+          ? `
+
+            <br>
+
+            <span
+              style="
+                font-size:14px;
+                font-weight:normal;
+              "
+            >
+
+              Waktu kehadiran:
+              ${escapeHtml(
+                timingMessage
+              )}
+
+            </span>
+
+          `
+          : ''
+      }
+
+
+      ${
+        Number(
+          attendance.late_minutes || 0
+        ) > 0
+
+          ? `
+
+            <br>
+
+            Keterlambatan:
+
+            <strong>
+
+              ${Number(
+                attendance.late_minutes
+              )}
+
+              menit
+
+            </strong>
+
+          `
+
+          : ''
+      }
+
+
+    </div>
+
+  `;
+
+
+  // ==============================================
+  // SUARA
+  // ==============================================
+
+  if (isSubstitute) {
+
+    speak(
+      'Absensi guru pengganti berhasil.'
+    );
+
+  }
+  else if (isLate) {
+
+    speak(
+      'Absensi berhasil. Anda terlambat.'
+    );
+
+  }
+  else {
+
+    speak(
+      'Absensi berhasil.'
+    );
+
+  }
+
+}
 
 
   // ==================================================
