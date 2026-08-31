@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Absensi Mengajar Guru</title>
+
+  <script
+    src="https://unpkg.com/html5-qrcode"
+    type="text/javascript">
+  </script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eef2f5;
+      color: #17212a;
+    }
+
+    .header {
+      background: #174c38;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 18px auto;
+      padding: 0 14px 35px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #d8e0e6;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2 {
+      margin: 0 0 15px;
+      font-size: 19px;
+      color: #174c38;
+    }
+
+    .teacher-name {
+      font-size: 23px;
+      font-weight: bold;
+      color: #174c38;
+    }
+
+    .teacher-code {
+      margin-top: 5px;
+      color: #66727b;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #bcc7ce;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #174c38;
+      color: white;
+    }
+
+    .secondary {
+      background: #69767e;
+      color: white;
+    }
+
+    .danger {
+      background: #b64545;
+      color: white;
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .instruction {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f4f6f8;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #58646c;
+    }
+
+    .result {
+      padding: 20px;
+      text-align: center;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
+
+    .success {
+      background: #e9f7ee;
+      border: 2px solid #2d8a52;
+    }
+
+    .error {
+      background: #fdecec;
+      border: 2px solid #b53a3a;
+    }
+
+    .warning {
+      background: #fff7e5;
+      border: 2px solid #d99100;
+    }
+
+    .info {
+      background: #edf5fb;
+      border: 2px solid #4c83ac;
+    }
+
+    .icon {
+      font-size: 50px;
+      margin-bottom: 8px;
+    }
+
+    .result-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .details {
+      margin-top: 12px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .top-info {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    #clock {
+      font-size: 23px;
+      font-weight: bold;
+      color: #174c38;
+    }
+
+    #date {
+      margin-top: 3px;
+      font-size: 13px;
+      color: #66727b;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+  <h1>
+    MIS DAARUL ISHLAH
+  </h1>
+
+  <p>
+    ABSENSI MENGAJAR GURU
+  </p>
+
+</div>
+
+
+<div class="container">
+
+
+  <!-- JAM -->
+
+  <div class="card top-info">
+
+    <div id="clock">
+      --:--:--
+    </div>
+
+    <div id="date">
+      Memuat tanggal...
+    </div>
+
+  </div>
+
+
+  <!-- SETUP PROJECT -->
+
+  <div
+    id="setupPanel"
+    class="card hidden"
+  >
+
+    <h2>
+      Pengaturan Awal
+    </h2>
+
+    <p>
+      Pengaturan ini hanya dilakukan sekali
+      pada HP guru.
+    </p>
+
+    <label for="projectRefInput">
+      Supabase Project Reference
+    </label>
+
+    <input
+      id="projectRefInput"
+      type="text"
+      autocomplete="off"
+      placeholder="Project Reference"
+    >
+
+    <button
+      id="saveProjectBtn"
+      class="primary"
+      type="button"
+    >
+      Simpan
+    </button>
+
+  </div>
+
+
+  <!-- BELUM LOGIN -->
+
+  <div
+    id="loginPanel"
+    class="card hidden"
+  >
+
+    <h2>
+      Login Guru
+    </h2>
+
+    <div class="instruction">
+
+      Tekan tombol di bawah,
+      lalu scan QR kartu guru Anda.
+
+    </div>
+
+    <button
+      id="loginScanBtn"
+      class="primary"
+      type="button"
+    >
+      📷 Scan QR Kartu Guru
+    </button>
+
+  </div>
+
+
+  <!-- DATA GURU -->
+
+  <div
+    id="teacherPanel"
+    class="card hidden"
+  >
+
+    <div>
+      Login sebagai:
+    </div>
+
+    <div
+      id="teacherName"
+      class="teacher-name"
+    >
+      -
+    </div>
+
+    <div
+      id="teacherCode"
+      class="teacher-code"
+    >
+      -
+    </div>
+
+
+    <button
+      id="scanClassBtn"
+      class="primary"
+      type="button"
+    >
+      🏫 Scan QR Kelas
+    </button>
+
+
+    <button
+      id="logoutBtn"
+      class="secondary"
+      type="button"
+    >
+      Keluar / Ganti Guru
+    </button>
+
+  </div>
+
+
+  <!-- CAMERA -->
+
+  <div
+    id="cameraPanel"
+    class="card hidden"
+  >
+
+    <h2 id="cameraTitle">
+      Scan QR
+    </h2>
+
+    <div id="reader"></div>
+
+    <div
+      id="cameraInstruction"
+      class="instruction"
+    >
+      Arahkan kamera ke QR.
+    </div>
+
+    <button
+      id="cancelScanBtn"
+      class="secondary"
+      type="button"
+    >
+      Batalkan Scan
+    </button>
+
+  </div>
+
+
+  <!-- HASIL -->
+
+  <div
+    id="resultPanel"
+    class="hidden"
+  ></div>
+
+
+</div>
+
+
+<script>
+
+
+// ==================================================
+// CONFIG
+// ==================================================
+
+let PROJECT_REF =
+  localStorage.getItem(
+    'guru_project_ref'
+  ) || '';
+
+
+let SESSION_TOKEN =
+  localStorage.getItem(
+    'guru_session_token'
+  ) || '';
+
+
+let currentMode = '';
+
+let qrScanner = null;
+
+let cameraRunning = false;
+
+let processing = false;
+
+
+// ==================================================
+// JAM
+// ==================================================
+
+function updateClock() {
+
+  const now =
+    new Date();
+
+
+  document
+    .getElementById('clock')
+    .textContent =
+      now.toLocaleTimeString(
+        'id-ID',
+        {
+          hour12: false
+        }
+      );
+
+
+  document
+    .getElementById('date')
+    .textContent =
+      now.toLocaleDateString(
+        'id-ID',
+        {
+          weekday: 'long',
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        }
+      );
+
+}
+
+
+updateClock();
+
+setInterval(
+  updateClock,
+  1000
+);
+
+
+// ==================================================
+// API
+// ==================================================
+
+async function callApi(
+  action,
+  payload = {},
+  useSession = true
+) {
+
+  const url =
+    'https://' +
+    PROJECT_REF +
+    '.supabase.co/functions/v1/teacher-mobile-api';
+
+
+  const headers = {
+
+    'Content-Type':
+      'application/json'
+
+  };
+
+
+  if (
+    useSession &&
+    SESSION_TOKEN
+  ) {
+
+    headers[
+      'x-teacher-session'
+    ] =
+      SESSION_TOKEN;
+
+  }
+
+
+  const response =
+    await fetch(
+      url,
+      {
+
+        method:
+          'POST',
+
+        headers:
+          headers,
+
+        body:
+          JSON.stringify({
+            action:
+              action,
+            ...payload
+          })
+
+      }
+    );
+
+
+  let data;
+
+
+  try {
+
+    data =
+      await response.json();
+
+  }
+  catch {
+
+    throw new Error(
+      'Response server tidak valid.'
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+// ==================================================
+// SETUP
+// ==================================================
+
+document
+  .getElementById(
+    'saveProjectBtn'
+  )
+  .addEventListener(
+    'click',
+    function() {
+
+      const value =
+        document
+          .getElementById(
+            'projectRefInput'
+          )
+          .value
+          .trim();
+
+
+      if (!value) {
+
+        alert(
+          'Project Reference wajib diisi.'
+        );
+
+        return;
+
+      }
+
+
+      localStorage.setItem(
+        'guru_project_ref',
+        value
+      );
+
+
+      PROJECT_REF =
+        value;
+
+
+      document
+        .getElementById(
+          'setupPanel'
+        )
+        .classList
+        .add('hidden');
+
+
+      document
+        .getElementById(
+          'loginPanel'
+        )
+        .classList
+        .remove('hidden');
+
+    }
+  );
+
+
+// ==================================================
+// LOGIN SCAN
+// ==================================================
+
+document
+  .getElementById(
+    'loginScanBtn'
+  )
+  .addEventListener(
+    'click',
+    function() {
+
+      currentMode =
+        'teacher';
+
+
+      document
+        .getElementById(
+          'cameraTitle'
+        )
+        .textContent =
+          'Scan Kartu QR Guru';
+
+
+      document
+        .getElementById(
+          'cameraInstruction'
+        )
+        .textContent =
+          'Arahkan kamera ke QR kartu guru Anda.';
+
+
+      startCamera();
+
+    }
+  );
+
+
+// ==================================================
+// SCAN KELAS
+// ==================================================
+
+document
+  .getElementById(
+    'scanClassBtn'
+  )
+  .addEventListener(
+    'click',
+    function() {
+
+      currentMode =
+        'class';
+
+
+      document
+        .getElementById(
+          'cameraTitle'
+        )
+        .textContent =
+          'Scan QR Kelas';
+
+
+      document
+        .getElementById(
+          'cameraInstruction'
+        )
+        .textContent =
+          'Arahkan kamera ke QR yang terpasang di kelas.';
+
+
+      startCamera();
+
+    }
+  );
+
+
+// ==================================================
+// START CAMERA
+// ==================================================
+
+async function startCamera() {
+
+  if (cameraRunning) {
+    return;
+  }
+
+
+  document
+    .getElementById(
+      'cameraPanel'
+    )
+    .classList
+    .remove('hidden');
+
+
+  document
+    .getElementById(
+      'resultPanel'
+    )
+    .classList
+    .add('hidden');
+
+
+  qrScanner =
+    new Html5Qrcode(
+      'reader'
+    );
+
+
+  try {
+
+    await qrScanner.start(
+
+      {
+        facingMode:
+          'environment'
+      },
+
+      {
+        fps:
+          10,
+
+        qrbox: {
+          width:
+            250,
+          height:
+            250
+        }
+      },
+
+      onScanSuccess,
+
+      function() {
+        // error tiap frame diabaikan
+      }
+
+    );
+
+
+    cameraRunning =
+      true;
+
+  }
+  catch (error) {
+
+    showError(
+      'Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.'
+    );
+
+  }
+
+}
+
+
+// ==================================================
+// STOP CAMERA
+// ==================================================
+
+async function stopCamera() {
+
+  if (
+    qrScanner &&
+    cameraRunning
+  ) {
+
+    try {
+
+      await qrScanner.stop();
+
+      qrScanner.clear();
+
+    }
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  }
+
+
+  cameraRunning =
+    false;
+
+  qrScanner =
+    null;
+
+
+  document
+    .getElementById(
+      'cameraPanel'
+    )
+    .classList
+    .add('hidden');
+
+}
+
+
+// ==================================================
+// CANCEL
+// ==================================================
+
+document
+  .getElementById(
+    'cancelScanBtn'
+  )
+  .addEventListener(
+    'click',
+    stopCamera
+  );
+
+
+// ==================================================
+// QR TERBACA
+// ==================================================
+
+async function onScanSuccess(
+  decodedText
+) {
+
+  if (processing) {
+    return;
+  }
+
+
+  processing =
+    true;
+
+
+  const token =
+    String(
+      decodedText || ''
+    )
+      .trim();
+
+
+  await stopCamera();
+
+
+  try {
+
+
+    // ==============================================
+    // LOGIN GURU
+    // ==============================================
+
+    if (
+      currentMode ===
+      'teacher'
+    ) {
+
+      if (
+        !token.startsWith(
+          'TCHR-'
+        )
+      ) {
+
+        showError(
+          'QR ini bukan kartu guru.'
+        );
+
+        processing =
+          false;
+
+        return;
+
+      }
+
+
+      const result =
+        await callApi(
+
+          'loginTeacher',
+
+          {
+            teacher_qr_token:
+              token
+          },
+
+          false
+
+        );
+
+
+      if (
+        !result ||
+        result.success !== true
+      ) {
+
+        showError(
+          result &&
+          result.message
+            ? result.message
+            : 'Login gagal.'
+        );
+
+        processing =
+          false;
+
+        return;
+
+      }
+
+
+      const payload =
+        result.data || {};
+
+
+      SESSION_TOKEN =
+        payload.session_token;
+
+
+      localStorage.setItem(
+        'guru_session_token',
+        SESSION_TOKEN
+      );
+
+
+      showTeacher(
+        payload.teacher
+      );
+
+
+      showSuccessMessage(
+        'LOGIN BERHASIL',
+        'Selamat datang ' +
+        (
+          payload.teacher
+            ?.full_name ||
+          ''
+        )
+      );
+
+    }
+
+
+    // ==============================================
+    // SCAN KELAS
+    // ==============================================
+
+    else if (
+      currentMode ===
+      'class'
+    ) {
+
+      if (
+        !token.startsWith(
+          'CLASS-'
+        )
+      ) {
+
+        showError(
+          'QR ini bukan QR kelas.'
+        );
+
+        processing =
+          false;
+
+        return;
+
+      }
+
+
+      const result =
+        await callApi(
+          'scanClass',
+          {
+            class_qr_token:
+              token
+          }
+        );
+
+
+      showAttendanceResult(
+        result
+      );
+
+    }
+
+
+  }
+  catch (error) {
+
+    showError(
+      error.message ||
+      'Terjadi kesalahan.'
+    );
+
+  }
+
+
+  processing =
+    false;
+
+}
+
+
+// ==================================================
+// SHOW TEACHER
+// ==================================================
+
+function showTeacher(
+  teacher
+) {
+
+  document
+    .getElementById(
+      'loginPanel'
+    )
+    .classList
+    .add('hidden');
+
+
+  document
+    .getElementById(
+      'teacherPanel'
+    )
+    .classList
+    .remove('hidden');
+
+
+  document
+    .getElementById(
+      'teacherName'
+    )
+    .textContent =
+      teacher?.full_name ||
+      '-';
+
+
+  document
+    .getElementById(
+      'teacherCode'
+    )
+    .textContent =
+      'Kode Guru: ' +
+      (
+        teacher?.teacher_code ||
+        '-'
+      );
+
+}
+
+
+// ==================================================
+// RESULT ABSENSI
+// ==================================================
+
+function showAttendanceResult(
+  result
+) {
+
+  if (
+    !result ||
+    result.success !== true
+  ) {
+
+    if (
+      result &&
+      (
+        result.message ===
+        'Session guru tidak valid.' ||
+        result.message ===
+        'Session guru sudah berakhir. Silakan login kembali.'
+      )
+    ) {
+
+      clearSession();
+
+    }
+
+
+    showError(
+      result?.message ||
+      'Absensi gagal.'
+    );
+
+    return;
+
+  }
+
+
+  const payload =
+    result.data || {};
+
+
+  const teacher =
+    payload.teacher || {};
+
+
+  const schedule =
+    payload.schedule || {};
+
+
+  const attendance =
+    payload.attendance || {};
+
+
+  const subject =
+    schedule.subject || {};
+
+
+  const classData =
+    schedule.class || {};
+
+
+  const originalTeacher =
+    schedule.original_teacher || {};
+
+
+  const isSubstitute =
+    payload.is_substitute === true ||
+    schedule.is_substitute === true ||
+    attendance.status ===
+      'pengganti';
+
+
+  const duplicate =
+    result.duplicate === true;
+
+
+  let title;
+
+
+  if (duplicate) {
+
+    title =
+      'ABSENSI SUDAH TERCATAT';
+
+  }
+  else if (isSubstitute) {
+
+    title =
+      'ABSENSI PENGGANTI BERHASIL';
+
+  }
+  else {
+
+    title =
+      'ABSENSI BERHASIL';
+
+  }
+
+
+  let statusText =
+    payload.timing_message ||
+    attendance.status ||
+    '';
+
+
+  if (isSubstitute) {
+
+    statusText =
+      'GURU PENGGANTI — ' +
+      (
+        payload.timing_message ||
+        ''
+      );
+
+  }
+
+
+  const panel =
+    document.getElementById(
+      'resultPanel'
+    );
+
+
+  panel.className =
+    'result success';
+
+
+  panel.innerHTML = `
+
+    <div class="icon">
+      ${
+        duplicate
+          ? 'ℹ️'
+          : (
+              isSubstitute
+                ? '🔄'
+                : '✅'
+            )
+      }
+    </div>
+
+
+    <div class="result-title">
+      ${escapeHtml(title)}
+    </div>
+
+
+    <div
+      style="
+        margin-top:12px;
+        font-size:20px;
+        font-weight:bold;
+      "
+    >
+      ${escapeHtml(
+        teacher.full_name || ''
+      )}
+    </div>
+
+
+    ${
+      isSubstitute &&
+      originalTeacher.full_name
+
+        ? `
+
+          <div
+            style="
+              margin-top:10px;
+              padding:10px;
+              background:#fff7e5;
+              border-radius:8px;
+            "
+          >
+
+            Menggantikan:
+
+            <strong>
+              ${escapeHtml(
+                originalTeacher.full_name
+              )}
+            </strong>
+
+          </div>
+
+        `
+
+        : ''
+    }
+
+
+    <div class="details">
+
+      <strong>
+        ${escapeHtml(
+          subject.subject_name ||
+          '-'
+        )}
+      </strong>
+
+      <br>
+
+      ${escapeHtml(
+        classData.class_name ||
+        '-'
+      )}
+
+      <br><br>
+
+      Jadwal:
+
+      <strong>
+
+        ${formatTime(
+          schedule.start_time
+        )}
+
+        -
+
+        ${formatTime(
+          schedule.end_time
+        )}
+
+      </strong>
+
+      <br>
+
+      Waktu Scan:
+
+      <strong>
+        ${formatTimestamp(
+          attendance.scan_time
+        )}
+      </strong>
+
+      <div class="status">
+
+        ${escapeHtml(
+          statusText
+        )}
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  panel.classList
+    .remove('hidden');
+
+}
+
+
+// ==================================================
+// SUCCESS GENERIC
+// ==================================================
+
+function showSuccessMessage(
+  title,
+  message
+) {
+
+  const panel =
+    document.getElementById(
+      'resultPanel'
+    );
+
+
+  panel.className =
+    'result success';
+
+
+  panel.innerHTML = `
+
+    <div class="icon">
+      ✅
+    </div>
+
+    <div class="result-title">
+      ${escapeHtml(title)}
+    </div>
+
+    <div class="details">
+      ${escapeHtml(message)}
+    </div>
+
+  `;
+
+
+  panel.classList
+    .remove('hidden');
+
+}
+
+
+// ==================================================
+// ERROR
+// ==================================================
+
+function showError(
+  message
+) {
+
+  const panel =
+    document.getElementById(
+      'resultPanel'
+    );
+
+
+  panel.className =
+    'result error';
+
+
+  panel.innerHTML = `
+
+    <div class="icon">
+      ❌
+    </div>
+
+    <div class="result-title">
+      GAGAL
+    </div>
+
+    <div class="details">
+      ${escapeHtml(message)}
+    </div>
+
+  `;
+
+
+  panel.classList
+    .remove('hidden');
+
+}
+
+
+// ==================================================
+// LOGOUT
+// ==================================================
+
+document
+  .getElementById(
+    'logoutBtn'
+  )
+  .addEventListener(
+    'click',
+    async function() {
+
+      try {
+
+        if (SESSION_TOKEN) {
+
+          await callApi(
+            'logoutTeacher'
+          );
+
+        }
+
+      }
+      catch {
+        // tetap logout lokal
+      }
+
+
+      clearSession();
+
+
+      document
+        .getElementById(
+          'teacherPanel'
+        )
+        .classList
+        .add('hidden');
+
+
+      document
+        .getElementById(
+          'loginPanel'
+        )
+        .classList
+        .remove('hidden');
+
+
+      showSuccessMessage(
+        'LOGOUT BERHASIL',
+        'Silakan login guru kembali.'
+      );
+
+    }
+  );
+
+
+// ==================================================
+// CLEAR SESSION
+// ==================================================
+
+function clearSession() {
+
+  SESSION_TOKEN =
+    '';
+
+
+  localStorage.removeItem(
+    'guru_session_token'
+  );
+
+}
+
+
+// ==================================================
+// CHECK SESSION
+// ==================================================
+
+async function checkSession() {
+
+  if (!PROJECT_REF) {
+
+    document
+      .getElementById(
+        'setupPanel'
+      )
+      .classList
+      .remove('hidden');
+
+    return;
+
+  }
+
+
+  if (!SESSION_TOKEN) {
+
+    document
+      .getElementById(
+        'loginPanel'
+      )
+      .classList
+      .remove('hidden');
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await callApi(
+        'me'
+      );
+
+
+    if (
+      result &&
+      result.success === true
+    ) {
+
+      showTeacher(
+        result.data.teacher
+      );
+
+      return;
+
+    }
+
+
+    clearSession();
+
+
+    document
+      .getElementById(
+        'loginPanel'
+      )
+      .classList
+      .remove('hidden');
+
+  }
+  catch {
+
+    clearSession();
+
+
+    document
+      .getElementById(
+        'loginPanel'
+      )
+      .classList
+      .remove('hidden');
+
+  }
+
+}
+
+
+// ==================================================
+// HELPERS
+// ==================================================
+
+function formatTime(
+  value
+) {
+
+  if (!value) {
+    return '-';
+  }
+
+  return String(value)
+    .substring(0, 5);
+
+}
+
+
+function formatTimestamp(
+  value
+) {
+
+  if (!value) {
+    return '-';
+  }
+
+
+  try {
+
+    return new Date(value)
+      .toLocaleTimeString(
+        'id-ID',
+        {
+          hour:
+            '2-digit',
+          minute:
+            '2-digit',
+          hour12:
+            false
+        }
+      );
+
+  }
+  catch {
+
+    return '-';
+
+  }
+
+}
+
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value == null
+      ? ''
+      : value
+  )
+
+    .replaceAll(
+      '&',
+      '&amp;'
+    )
+
+    .replaceAll(
+      '<',
+      '&lt;'
+    )
+
+    .replaceAll(
+      '>',
+      '&gt;'
+    )
+
+    .replaceAll(
+      '"',
+      '&quot;'
+    )
+
+    .replaceAll(
+      "'",
+      '&#039;'
+    );
+
+}
+
+
+// ==================================================
+// START
+// ==================================================
+
+checkSession();
+
+
+</script>
+
+</body>
+
+</html>
