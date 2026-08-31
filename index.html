@@ -1221,18 +1221,14 @@ function findAttendancePayload(obj, depth = 0) {
     return null;
   }
 
-  if (depth > 8) {
+  if (depth > 10) {
     return null;
   }
 
-  // Jika sudah menemukan isi absensi
-  if (
-    obj.teacher ||
-    obj.schedule ||
-    obj.attendance
-  ) {
-    return obj;
-  }
+
+  // ==================================================
+  // CARI KE LAPISAN DALAM DULU
+  // ==================================================
 
   const keys = [
     'data',
@@ -1242,6 +1238,7 @@ function findAttendancePayload(obj, depth = 0) {
     'payload',
     'body'
   ];
+
 
   for (const key of keys) {
 
@@ -1256,6 +1253,7 @@ function findAttendancePayload(obj, depth = 0) {
           depth + 1
         );
 
+
       if (found) {
         return found;
       }
@@ -1263,6 +1261,62 @@ function findAttendancePayload(obj, depth = 0) {
     }
 
   }
+
+
+  // ==================================================
+  // BARU CEK OBJEK SAAT INI
+  // ==================================================
+
+  const teacher =
+    obj.teacher || {};
+
+
+  const schedule =
+    obj.schedule || {};
+
+
+  const attendance =
+    obj.attendance || {};
+
+
+  const hasTeacherData =
+    !!(
+      teacher.full_name ||
+      teacher.name ||
+      teacher.teacher_code ||
+      teacher.id
+    );
+
+
+  const hasScheduleData =
+    !!(
+      schedule.id ||
+      schedule.start_time ||
+      schedule.end_time ||
+      schedule.class ||
+      schedule.subject
+    );
+
+
+  const hasAttendanceData =
+    !!(
+      attendance.id ||
+      attendance.scan_time ||
+      attendance.time ||
+      attendance.status
+    );
+
+
+  if (
+    hasTeacherData ||
+    hasScheduleData ||
+    hasAttendanceData
+  ) {
+
+    return obj;
+
+  }
+
 
   return null;
 }
