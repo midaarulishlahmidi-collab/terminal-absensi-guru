@@ -1212,10 +1212,125 @@
 
 
 // ==================================================
+// MENCARI DATA ABSENSI DI DALAM RESPONSE
+// ==================================================
+
+function findAttendancePayload(obj, depth = 0) {
+
+  if (!obj || typeof obj !== 'object') {
+    return null;
+  }
+
+  if (depth > 8) {
+    return null;
+  }
+
+  // Jika sudah menemukan isi absensi
+  if (
+    obj.teacher ||
+    obj.schedule ||
+    obj.attendance
+  ) {
+    return obj;
+  }
+
+  const keys = [
+    'data',
+    'result',
+    'response',
+    'gateway',
+    'payload',
+    'body'
+  ];
+
+  for (const key of keys) {
+
+    if (
+      obj[key] &&
+      typeof obj[key] === 'object'
+    ) {
+
+      const found =
+        findAttendancePayload(
+          obj[key],
+          depth + 1
+        );
+
+      if (found) {
+        return found;
+      }
+
+    }
+
+  }
+
+  return null;
+}
+
+
+// ==================================================
+// MENCARI ERROR DARI SERVER
+// ==================================================
+
+function findServerError(obj, depth = 0) {
+
+  if (!obj || typeof obj !== 'object') {
+    return null;
+  }
+
+  if (depth > 8) {
+    return null;
+  }
+
+  if (obj.success === false) {
+    return obj;
+  }
+
+  const keys = [
+    'data',
+    'result',
+    'response',
+    'gateway',
+    'payload',
+    'body'
+  ];
+
+  for (const key of keys) {
+
+    if (
+      obj[key] &&
+      typeof obj[key] === 'object'
+    ) {
+
+      const found =
+        findServerError(
+          obj[key],
+          depth + 1
+        );
+
+      if (found) {
+        return found;
+      }
+
+    }
+
+  }
+
+  return null;
+}
+
+
+// ==================================================
 // RESULT
 // ==================================================
 
 function showResult(data) {
+
+  console.log(
+    'RESPONSE TERMINAL:',
+    data
+  );
+
 
   if (!data) {
 
@@ -1227,14 +1342,18 @@ function showResult(data) {
   }
 
 
-  // ==============================================
-  // ERROR DARI SERVER
-  // ==============================================
+  // ----------------------------------------------
+  // CEK ERROR
+  // ----------------------------------------------
 
-  if (data.success === false) {
+  const serverError =
+    findServerError(data);
+
+
+  if (serverError) {
 
     showError(
-      data.message ||
+      serverError.message ||
       'Absensi gagal.'
     );
 
@@ -1242,28 +1361,39 @@ function showResult(data) {
   }
 
 
-  /*
-   * Backend recordAttendance versi baru
-   * menyimpan hasil utama di dalam data.data.
-   *
-   * Fallback "|| data" dibuat agar tetap
-   * kompatibel dengan response versi lama.
-   */
+  // ----------------------------------------------
+  // TEMUKAN DATA ABSENSI
+  // ----------------------------------------------
 
   const payload =
-    data.data || data;
+    findAttendancePayload(data);
 
 
-  const attendance =
-    payload.attendance || {};
+  if (!payload) {
+
+    showError(
+      'Absensi berhasil diproses, tetapi detail data tidak ditemukan.'
+    );
+
+    console.log(
+      'RAW RESPONSE:',
+      JSON.stringify(data, null, 2)
+    );
+
+    return;
+  }
+
+
+  const teacher =
+    payload.teacher || {};
 
 
   const schedule =
     payload.schedule || {};
 
 
-  const teacher =
-    payload.teacher || {};
+  const attendance =
+    payload.attendance || {};
 
 
   const subject =
@@ -1292,22 +1422,74 @@ function showResult(data) {
 
   const timingMessage =
     payload.timing_message ||
-    (
-      attendance.status === 'pengganti'
-        ? 'Guru Pengganti'
-        : attendance.status || ''
-    );
+    attendance.status_label ||
+    attendance.status ||
+    '';
 
 
   const isLate =
     timingStatus === 'terlambat';
 
 
-  // ==============================================
+  // ----------------------------------------------
   // DUPLIKAT
-  // ==============================================
+  // ----------------------------------------------
 
-  if (data.duplicate) {
+  let duplicate = false;
+
+
+  function findDuplicate(obj, depth = 0) {
+
+    if (!obj || typeof obj !== 'object') {
+      return false;
+    }
+
+    if (depth > 8) {
+      return false;
+    }
+
+    if (obj.duplicate === true) {
+      return true;
+    }
+
+    const keys = [
+      'data',
+      'result',
+      'response',
+      'gateway',
+      'payload',
+      'body'
+    ];
+
+    for (const key of keys) {
+
+      if (
+        obj[key] &&
+        typeof obj[key] === 'object'
+      ) {
+
+        if (
+          findDuplicate(
+            obj[key],
+            depth + 1
+          )
+        ) {
+          return true;
+        }
+
+      }
+
+    }
+
+    return false;
+  }
+
+
+  duplicate =
+    findDuplicate(data);
+
+
+  if (duplicate) {
 
     const result =
       document.getElementById(
@@ -1329,28 +1511,26 @@ function showResult(data) {
         ABSENSI SUDAH TERCATAT
       </div>
 
-
       <div class="teacher-name">
 
         ${escapeHtml(
           teacher.full_name ||
           teacher.name ||
-          ''
+          '-'
         )}
 
       </div>
 
-
       <div class="details">
 
         ${escapeHtml(
-          subject.subject_name || ''
+          subject.subject_name || '-'
         )}
 
         <br>
 
         ${escapeHtml(
-          classData.class_name || ''
+          classData.class_name || '-'
         )}
 
         <br><br>
@@ -1358,23 +1538,14 @@ function showResult(data) {
         Jadwal:
 
         <strong>
-
-          ${formatTime(
-            schedule.start_time
-          )}
-
+          ${formatTime(schedule.start_time)}
           -
-
-          ${formatTime(
-            schedule.end_time
-          )}
-
+          ${formatTime(schedule.end_time)}
         </strong>
 
         <br><br>
 
-        Jadwal mengajar ini sudah
-        tercatat sebelumnya.
+        Jadwal ini sudah melakukan absensi.
 
       </div>
 
@@ -1385,54 +1556,13 @@ function showResult(data) {
       'Absensi sudah tercatat.'
     );
 
-
     return;
   }
 
 
-  // ==============================================
-  // ABSENSI BERHASIL
-  // ==============================================
-
-  const result =
-    document.getElementById(
-      'result'
-    );
-
-
-  result.className =
-    isLate
-      ? 'warning'
-      : 'success';
-
-
-  // ==============================================
-  // LABEL STATUS
-  // ==============================================
-
-  let mainStatus = '';
-
-  if (isSubstitute) {
-
-    mainStatus =
-      'GURU PENGGANTI';
-
-  }
-  else {
-
-    mainStatus =
-      timingMessage
-        ? String(
-            timingMessage
-          ).toUpperCase()
-        : 'ABSENSI BERHASIL';
-
-  }
-
-
-  // ==============================================
-  // INFO GURU ASLI JIKA PENGGANTI
-  // ==============================================
+  // ----------------------------------------------
+  // INFO GURU PENGGANTI
+  // ----------------------------------------------
 
   let substituteInfo = '';
 
@@ -1443,23 +1573,23 @@ function showResult(data) {
 
       <div
         style="
-          margin-top:12px;
-          padding:10px 14px;
+          margin-top:14px;
+          padding:12px 15px;
           background:#fff7e5;
+          border:1px solid #e8c66a;
           border-radius:8px;
-          font-size:14px;
         "
       >
 
         <strong>
-          GURU PENGGANTI
+          🔄 GURU PENGGANTI
         </strong>
 
         ${
           originalTeacher.full_name
             ? `
 
-              <br>
+              <br><br>
 
               Menggantikan:
 
@@ -1480,9 +1610,50 @@ function showResult(data) {
   }
 
 
-  // ==============================================
-  // TAMPILKAN HASIL
-  // ==============================================
+  // ----------------------------------------------
+  // STATUS UTAMA
+  // ----------------------------------------------
+
+  let statusText = '';
+
+
+  if (isSubstitute) {
+
+    statusText =
+      'GURU PENGGANTI';
+
+  }
+  else if (timingMessage) {
+
+    statusText =
+      String(
+        timingMessage
+      ).toUpperCase();
+
+  }
+  else {
+
+    statusText =
+      'ABSENSI BERHASIL';
+
+  }
+
+
+  // ----------------------------------------------
+  // TAMPILAN
+  // ----------------------------------------------
+
+  const result =
+    document.getElementById(
+      'result'
+    );
+
+
+  result.className =
+    isLate
+      ? 'warning'
+      : 'success';
+
 
   result.innerHTML = `
 
@@ -1517,7 +1688,7 @@ function showResult(data) {
       ${escapeHtml(
         teacher.full_name ||
         teacher.name ||
-        ''
+        '-'
       )}
 
     </div>
@@ -1528,7 +1699,6 @@ function showResult(data) {
 
     <div class="details">
 
-
       <strong>
 
         ${escapeHtml(
@@ -1537,17 +1707,13 @@ function showResult(data) {
 
       </strong>
 
-
       <br>
-
 
       ${escapeHtml(
         classData.class_name || '-'
       )}
 
-
       <br><br>
-
 
       Jadwal:
 
@@ -1565,9 +1731,7 @@ function showResult(data) {
 
       </strong>
 
-
       <br>
-
 
       Waktu Scan:
 
@@ -1580,14 +1744,12 @@ function showResult(data) {
 
       </strong>
 
-
       <br><br>
-
 
       <span class="status-text">
 
         ${escapeHtml(
-          mainStatus
+          statusText
         )}
 
       </span>
@@ -1596,6 +1758,7 @@ function showResult(data) {
       ${
         isSubstitute &&
         timingMessage
+
           ? `
 
             <br>
@@ -1607,7 +1770,7 @@ function showResult(data) {
               "
             >
 
-              Waktu kehadiran:
+              Kehadiran:
               ${escapeHtml(
                 timingMessage
               )}
@@ -1615,6 +1778,7 @@ function showResult(data) {
             </span>
 
           `
+
           : ''
       }
 
@@ -1645,15 +1809,14 @@ function showResult(data) {
           : ''
       }
 
-
     </div>
 
   `;
 
 
-  // ==============================================
+  // ----------------------------------------------
   // SUARA
-  // ==============================================
+  // ----------------------------------------------
 
   if (isSubstitute) {
 
