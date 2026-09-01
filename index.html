@@ -1395,6 +1395,289 @@ function showResult(data) {
     return;
   }
 
+    // ----------------------------------------------
+  // MASUK / KELUAR MENGAJAR
+  // ----------------------------------------------
+
+  if (
+    data.terminal_action ===
+    'check_out'
+  ) {
+
+    const teacher =
+      data.teacher || {};
+
+
+    const session =
+      data.teaching_session || {};
+
+
+    const durationMinutes =
+      Number(
+        session.duration_minutes || 0
+      );
+
+
+    const durationHours =
+      Math.floor(
+        durationMinutes / 60
+      );
+
+
+    const remainingMinutes =
+      durationMinutes % 60;
+
+
+    let durationText =
+      durationMinutes +
+      ' menit';
+
+
+    if (durationHours > 0) {
+
+      durationText =
+        durationHours +
+        ' jam ' +
+        remainingMinutes +
+        ' menit';
+
+    }
+
+
+    const result =
+      document.getElementById(
+        'result'
+      );
+
+
+    result.className =
+      'warning';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        🔴
+      </div>
+
+      <div class="result-title">
+        KELUAR MENGAJAR
+      </div>
+
+      <div class="teacher-name">
+
+        ${escapeHtml(
+          teacher.full_name ||
+          '-'
+        )}
+
+      </div>
+
+      <div class="details">
+
+        Kode Guru:
+
+        <strong>
+          ${escapeHtml(
+            teacher.teacher_code ||
+            '-'
+          )}
+        </strong>
+
+        <br><br>
+
+        Jam Masuk:
+
+        <strong>
+          ${formatTerminalTimestamp(
+            session.check_in_time
+          )}
+        </strong>
+
+        <br>
+
+        Jam Keluar:
+
+        <strong>
+          ${formatTerminalTimestamp(
+            session.check_out_time
+          )}
+        </strong>
+
+        <br><br>
+
+        Durasi Sesi:
+
+        <strong>
+          ${escapeHtml(
+            durationText
+          )}
+        </strong>
+
+        <br><br>
+
+        ✅ Sesi mengajar telah ditutup.
+
+      </div>
+
+    `;
+
+
+    speak(
+      'Keluar mengajar berhasil. ' +
+      (
+        teacher.full_name ||
+        ''
+      )
+    );
+
+
+    return;
+
+  }
+
+
+  if (
+    data.terminal_action ===
+    'check_in'
+  ) {
+
+    const payload =
+      findAttendancePayload(
+        data
+      ) || {};
+
+
+    const teacher =
+      payload.teacher || {};
+
+
+    const schedule =
+      payload.schedule || {};
+
+
+    const subject =
+      schedule.subject || {};
+
+
+    const classData =
+      schedule.class || {};
+
+
+    const session =
+      data.teaching_session || {};
+
+
+    const result =
+      document.getElementById(
+        'result'
+      );
+
+
+    result.className =
+      'success';
+
+
+    result.innerHTML = `
+
+      <div class="icon">
+        🟢
+      </div>
+
+      <div class="result-title">
+        MASUK MENGAJAR
+      </div>
+
+      <div class="teacher-name">
+
+        ${escapeHtml(
+          teacher.full_name ||
+          teacher.name ||
+          '-'
+        )}
+
+      </div>
+
+
+      <div class="details">
+
+        Jam Masuk:
+
+        <strong>
+          ${formatTerminalTimestamp(
+            session.check_in_time
+          )}
+        </strong>
+
+
+        <br><br>
+
+        Mata Pelajaran:
+
+        <strong>
+          ${escapeHtml(
+            subject.subject_name ||
+            '-'
+          )}
+        </strong>
+
+
+        <br>
+
+        Kelas:
+
+        <strong>
+          ${escapeHtml(
+            classData.class_name ||
+            '-'
+          )}
+        </strong>
+
+
+        <br>
+
+        Jadwal:
+
+        <strong>
+
+          ${formatTime(
+            schedule.start_time
+          )}
+
+          -
+
+          ${formatTime(
+            schedule.end_time
+          )}
+
+        </strong>
+
+
+        <br><br>
+
+        ✅ Sesi mengajar telah dibuka.
+
+        <br>
+
+        Silakan menuju kelas dan scan QR kelas.
+
+      </div>
+
+    `;
+
+
+    speak(
+      'Masuk mengajar berhasil. ' +
+      (
+        teacher.full_name ||
+        ''
+      )
+    );
+
+
+    return;
+
+  }
 
   // ----------------------------------------------
   // CEK ERROR
@@ -1925,6 +2208,70 @@ function showResult(data) {
     speak(
       'Absensi berhasil.'
     );
+
+  }
+
+}
+
+  // ==================================================
+// FORMAT WAKTU TERMINAL
+// ==================================================
+
+function formatTerminalTimestamp(
+  value
+) {
+
+  if (!value) {
+    return '-';
+  }
+
+
+  try {
+
+    const date =
+      new Date(
+        value
+      );
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return '-';
+
+    }
+
+
+    return date
+      .toLocaleTimeString(
+        'id-ID',
+        {
+
+          timeZone:
+            'Asia/Jakarta',
+
+          hour:
+            '2-digit',
+
+          minute:
+            '2-digit',
+
+          second:
+            '2-digit',
+
+          hour12:
+            false
+
+        }
+      );
+
+  }
+  catch (error) {
+
+    return '-';
 
   }
 
