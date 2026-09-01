@@ -1407,31 +1407,25 @@ function showResult(data) {
     const teacher =
       data.teacher || {};
 
-
     const session =
       data.teaching_session || {};
-
 
     const durationMinutes =
       Number(
         session.duration_minutes || 0
       );
 
-
     const durationHours =
       Math.floor(
         durationMinutes / 60
       );
 
-
     const remainingMinutes =
       durationMinutes % 60;
-
 
     let durationText =
       durationMinutes +
       ' menit';
-
 
     if (durationHours > 0) {
 
@@ -1444,6 +1438,17 @@ function showResult(data) {
     }
 
 
+    const isEarly =
+      session.checkout_status ===
+      'keluar_lebih_awal';
+
+
+    const earlyMinutes =
+      Number(
+        session.early_minutes || 0
+      );
+
+
     const result =
       document.getElementById(
         'result'
@@ -1451,17 +1456,53 @@ function showResult(data) {
 
 
     result.className =
-      'warning';
+      isEarly
+        ? 'warning'
+        : 'error';
+
+
+    const title =
+      isEarly
+        ? 'KELUAR LEBIH AWAL'
+        : 'KELUAR MENGAJAR';
+
+
+    const icon =
+      isEarly
+        ? '🟡'
+        : '🔴';
+
+
+    let earlyInfo = '';
+
+
+    if (isEarly) {
+
+      earlyInfo = `
+
+        <br><br>
+
+        <span class="status-text">
+
+          ⚠️ KELUAR
+          ${earlyMinutes}
+          MENIT LEBIH AWAL
+
+        </span>
+
+      `;
+
+    }
 
 
     result.innerHTML = `
 
       <div class="icon">
-        🔴
+        ${icon}
       </div>
 
       <div class="result-title">
-        KELUAR MENGAJAR
+        ${title}
       </div>
 
       <div class="teacher-name">
@@ -1504,6 +1545,17 @@ function showResult(data) {
           )}
         </strong>
 
+        <br>
+
+        Jadwal Berakhir:
+
+        <strong>
+          ${escapeHtml(
+            session.scheduled_end ||
+            '-'
+          )}
+        </strong>
+
         <br><br>
 
         Durasi Sesi:
@@ -1514,22 +1566,45 @@ function showResult(data) {
           )}
         </strong>
 
+        ${earlyInfo}
+
         <br><br>
 
-        ✅ Sesi mengajar telah ditutup.
+        ${escapeHtml(
+          data.message ||
+          'Sesi mengajar telah ditutup.'
+        )}
 
       </div>
 
     `;
 
 
-    speak(
-      'Keluar mengajar berhasil. ' +
-      (
-        teacher.full_name ||
-        ''
-      )
-    );
+    if (isEarly) {
+
+      speak(
+        'Keluar mengajar berhasil. ' +
+        (
+          teacher.full_name ||
+          ''
+        ) +
+        '. Keluar ' +
+        earlyMinutes +
+        ' menit lebih awal.'
+      );
+
+    }
+    else {
+
+      speak(
+        'Keluar mengajar berhasil. ' +
+        (
+          teacher.full_name ||
+          ''
+        )
+      );
+
+    }
 
 
     return;
