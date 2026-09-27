@@ -832,35 +832,10 @@ document
 
 
 // ==================================================
-// QR TERBACA
+// INPUT PIN GURU
 // ==================================================
 
-async function onScanSuccess(
-  decodedText
-) {
-
-  if (processing) {
-    return;
-  }
-
-
-  processing =
-    true;
-
-
-  const token =
-    String(
-      decodedText || ''
-    )
-      .trim();
-
-
-  await stopCamera();
-
-
-  try {
-
-    function requestTeacherPin() {
+function requestTeacherPin() {
 
   return new Promise(
     function(resolve) {
@@ -984,6 +959,36 @@ async function onScanSuccess(
 
 }
 
+
+// ==================================================
+// QR TERBACA
+// ==================================================
+
+async function onScanSuccess(
+  decodedText
+) {
+
+  if (processing) {
+    return;
+  }
+
+
+  processing =
+    true;
+
+
+  const token =
+    String(
+      decodedText || ''
+    )
+      .trim();
+
+
+  await stopCamera();
+
+
+  try {
+
     // ==============================================
     // LOGIN GURU
     // ==============================================
@@ -1031,8 +1036,8 @@ async function onScanSuccess(
 
           {
             teacher_qr_token:
-              token
-            
+              token,
+
             pin:
               teacherPin
           },
