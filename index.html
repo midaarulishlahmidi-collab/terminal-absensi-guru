@@ -1380,12 +1380,6 @@ function findServerError(obj, depth = 0) {
 
 function showResult(data) {
 
-  console.log(
-    'RESPONSE TERMINAL:',
-    data
-  );
-
-
   if (!data) {
 
     showError(
@@ -1890,49 +1884,10 @@ if (serverError) {
     findAttendancePayload(data);
 
 
- if (!payload) {
+if (!payload) {
 
-  const result =
-    document.getElementById(
-      'result'
-    );
-
-  result.className =
-    'error';
-
-  result.innerHTML = `
-
-    <div class="result-title">
-      DEBUG RESPONSE
-    </div>
-
-    <div
-      style="
-        margin-top:15px;
-        width:100%;
-        max-height:300px;
-        overflow:auto;
-        text-align:left;
-        font-size:12px;
-        white-space:pre-wrap;
-        word-break:break-word;
-        background:white;
-        padding:12px;
-        border-radius:8px;
-      "
-    >${escapeHtml(
-      JSON.stringify(
-        data,
-        null,
-        2
-      )
-    )}</div>
-
-  `;
-
-  console.log(
-    'RAW RESPONSE:',
-    data
+  showError(
+    'Respons server tidak dapat diproses. Silakan coba scan kembali.'
   );
 
   return;
