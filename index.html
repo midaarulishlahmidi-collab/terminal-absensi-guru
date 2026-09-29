@@ -1813,19 +1813,73 @@ if (
   // CEK ERROR
   // ----------------------------------------------
 
-  const serverError =
-    findServerError(data);
+const serverError =
+  findServerError(data);
 
+if (serverError) {
 
-  if (serverError) {
+  // ==============================================
+  // BELUM WAKTUNYA KELUAR
+  // ==============================================
 
-    showError(
-      serverError.message ||
-      'Absensi gagal.'
+  if (
+    serverError.terminal_action ===
+      'check_out_rejected' &&
+    String(
+      serverError.message || ''
+    ).includes(
+      'Belum dapat keluar mengajar'
+    )
+  ) {
+
+    const result =
+      document.getElementById(
+        'result'
+      );
+
+    result.className =
+      'warning';
+
+    result.innerHTML = `
+
+      <div class="icon">
+        ⏳
+      </div>
+
+      <div class="result-title">
+        BELUM WAKTUNYA KELUAR
+      </div>
+
+      <div class="details">
+
+        ${escapeHtml(
+          serverError.message ||
+          'Jadwal mengajar masih berlangsung.'
+        )}
+
+      </div>
+
+    `;
+
+    speak(
+      'Belum waktunya keluar mengajar.'
     );
 
     return;
   }
+
+
+  // ==============================================
+  // ERROR LAIN
+  // ==============================================
+
+  showError(
+    serverError.message ||
+    'Absensi gagal.'
+  );
+
+  return;
+}
 
 
   // ----------------------------------------------
