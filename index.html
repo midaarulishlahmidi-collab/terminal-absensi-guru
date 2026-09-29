@@ -2022,6 +2022,235 @@ html[data-theme="dark"]
     1.4;
 }
 
+  /* ==================================================
+   TERMINAL RESET MODAL
+   ================================================== */
+
+.terminal-reset-modal {
+  position: fixed;
+  inset: 0;
+
+  z-index: 20000;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(5, 11, 8, 0.68);
+
+  backdrop-filter:
+    blur(7px);
+}
+
+.terminal-reset-modal.show {
+  display: flex;
+}
+
+.terminal-reset-card {
+  width:
+    min(460px, 100%);
+
+  padding:
+    24px;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--text);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    22px;
+
+  box-shadow:
+    var(--shadow-strong);
+}
+
+.terminal-reset-icon-box {
+  width: 56px;
+  height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 17px;
+
+  background:
+    rgba(211, 77, 77, 0.12);
+
+  color:
+    var(--danger);
+
+  font-size: 25px;
+}
+
+.terminal-reset-title {
+  margin: 0;
+
+  font-size: 21px;
+
+  font-weight: 850;
+}
+
+.terminal-reset-text {
+  margin-top: 9px;
+
+  color:
+    var(--muted);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+.terminal-reset-warning {
+  margin-top: 16px;
+
+  padding:
+    11px 13px;
+
+  background:
+    rgba(211, 77, 77, 0.08);
+
+  border:
+    1px solid
+    rgba(211, 77, 77, 0.18);
+
+  border-radius:
+    12px;
+
+  color:
+    var(--danger);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+.terminal-reset-actions {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.terminal-reset-actions button {
+  min-height: 44px;
+
+  border-radius: 12px;
+}
+
+.terminal-reset-cancel {
+  background:
+    var(--surface-soft);
+
+  color:
+    var(--text);
+
+  border:
+    1px solid
+    var(--border);
+}
+
+.terminal-reset-confirm {
+  background:
+    linear-gradient(
+      135deg,
+      #d34d4d,
+      #ad3232
+    );
+
+  color:
+    #ffffff;
+}
+
+body.terminal-modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+
+  .terminal-reset-card {
+    padding: 19px;
+  }
+
+  .terminal-reset-actions {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+    /* ==================================================
+   SETUP VALIDATION MESSAGE
+   ================================================== */
+
+.setup-message {
+  display: none;
+
+  margin-top: 14px;
+
+  padding:
+    11px 13px;
+
+  border-radius:
+    12px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+
+  line-height:
+    1.5;
+}
+
+
+.setup-message.show {
+  display: block;
+}
+
+
+.setup-message.error {
+  color:
+    var(--danger);
+
+  background:
+    rgba(211, 77, 77, 0.09);
+
+  border:
+    1px solid
+    rgba(211, 77, 77, 0.22);
+}
+
+
+.setup-message.success {
+  color:
+    var(--success);
+
+  background:
+    rgba(43, 165, 101, 0.09);
+
+  border:
+    1px solid
+    rgba(43, 165, 101, 0.22);
+}
+    
   </style>
 
 </head>
@@ -2101,6 +2330,12 @@ html[data-theme="dark"]
       placeholder="TERM-XXXXXXXXXXXXXXXX"
     >
 
+    <div
+      id="setupMessage"
+      class="setup-message"
+      role="status"
+      aria-live="polite"
+    ></div>
 
     <button
       id="saveConfigBtn"
@@ -2298,6 +2533,70 @@ html[data-theme="dark"]
 
   </div>
 
+  <!-- ======================================
+     MODAL RESET TERMINAL
+     ====================================== -->
+
+<div
+  id="terminalResetModal"
+  class="terminal-reset-modal"
+  aria-hidden="true"
+  onclick="handleTerminalResetBackdrop(event)"
+>
+
+  <div
+    class="terminal-reset-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="terminalResetTitle"
+  >
+
+    <div class="terminal-reset-icon-box">
+      ⚠️
+    </div>
+
+    <h2
+      id="terminalResetTitle"
+      class="terminal-reset-title"
+    >
+      Reset Pengaturan Terminal?
+    </h2>
+
+    <div class="terminal-reset-text">
+      Project Reference dan Terminal Token
+      yang tersimpan pada komputer ini
+      akan dihapus.
+    </div>
+
+    <div class="terminal-reset-warning">
+      Setelah reset, terminal tidak dapat digunakan
+      sampai dikonfigurasi kembali.
+    </div>
+
+    <div class="terminal-reset-actions">
+
+      <button
+        type="button"
+        class="terminal-reset-cancel"
+        onclick="closeTerminalResetModal()"
+      >
+        Batal
+      </button>
+
+      <button
+        id="terminalResetConfirmButton"
+        type="button"
+        class="terminal-reset-confirm"
+        onclick="confirmTerminalReset()"
+      >
+        Ya, Reset Terminal
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
 <script>
 
@@ -2465,6 +2764,61 @@ initTerminalTheme();
 
   }
 
+  // ==================================================
+// SETUP MESSAGE
+// ==================================================
+
+function showSetupMessage(
+  type,
+  text
+) {
+
+  const box =
+    document.getElementById(
+      'setupMessage'
+    );
+
+
+  if (!box) {
+    return;
+  }
+
+
+  box.className =
+    'setup-message show ' +
+    (
+      type === 'success'
+        ? 'success'
+        : 'error'
+    );
+
+
+  box.textContent =
+    text || '';
+
+}
+
+
+function clearSetupMessage() {
+
+  const box =
+    document.getElementById(
+      'setupMessage'
+    );
+
+
+  if (!box) {
+    return;
+  }
+
+
+  box.className =
+    'setup-message';
+
+  box.textContent =
+    '';
+
+}
 
   // ==================================================
   // SAVE CONFIG
@@ -2477,6 +2831,7 @@ initTerminalTheme();
     .addEventListener(
       'click',
       function() {
+        clearSetupMessage();
 
         const projectRef =
           document
@@ -2498,7 +2853,8 @@ initTerminalTheme();
 
         if (!projectRef) {
 
-          alert(
+          showSetupMessage(
+            'error',
             'Supabase Project Reference wajib diisi.'
           );
 
@@ -2509,7 +2865,8 @@ initTerminalTheme();
 
         if (!terminalToken) {
 
-          alert(
+          showSetupMessage(
+            'error',
             'Terminal Token wajib diisi.'
           );
 
@@ -2524,7 +2881,8 @@ initTerminalTheme();
           )
         ) {
 
-          alert(
+          showSetupMessage(
+            'error',
             'Terminal Token tidak valid. Token harus diawali TERM-.'
           );
 
@@ -2592,41 +2950,157 @@ initTerminalTheme();
   // RESET CONFIG
   // ==================================================
 
-  document
-    .getElementById(
-      'resetBtn'
-    )
-    .addEventListener(
-      'click',
-      function() {
+// ==================================================
+// RESET TERMINAL MODERN
+// ==================================================
 
-        const ok =
-          confirm(
-            'Apakah Anda yakin ingin mereset konfigurasi terminal ini?'
-          );
+function openTerminalResetModal() {
 
+  const modal =
+    document.getElementById(
+      'terminalResetModal'
+    );
 
-        if (!ok) {
-          return;
-        }
-
-
-        localStorage.removeItem(
-          'absensi_project_ref'
-        );
-
-
-        localStorage.removeItem(
-          'absensi_terminal_token'
-        );
-
-
-        location.reload();
-
-      }
+  const confirmButton =
+    document.getElementById(
+      'terminalResetConfirmButton'
     );
 
 
+  if (!modal) {
+    return;
+  }
+
+
+  modal.classList.add(
+    'show'
+  );
+
+  modal.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
+  document.body.classList.add(
+    'terminal-modal-open'
+  );
+
+
+  setTimeout(
+    function() {
+
+      confirmButton?.focus();
+
+    },
+    60
+  );
+
+}
+
+
+function closeTerminalResetModal() {
+
+  const modal =
+    document.getElementById(
+      'terminalResetModal'
+    );
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  modal.classList.remove(
+    'show'
+  );
+
+  modal.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+  document.body.classList.remove(
+    'terminal-modal-open'
+  );
+
+}
+
+
+function handleTerminalResetBackdrop(
+  event
+) {
+
+  if (
+    event.target.id ===
+    'terminalResetModal'
+  ) {
+
+    closeTerminalResetModal();
+
+  }
+
+}
+
+
+function confirmTerminalReset() {
+
+  localStorage.removeItem(
+    'absensi_project_ref'
+  );
+
+  localStorage.removeItem(
+    'absensi_terminal_token'
+  );
+
+
+  closeTerminalResetModal();
+
+  location.reload();
+
+}
+
+
+document
+  .getElementById(
+    'resetBtn'
+  )
+  .addEventListener(
+    'click',
+    openTerminalResetModal
+  );
+
+
+document.addEventListener(
+  'keydown',
+  function(event) {
+
+    if (
+      event.key ===
+      'Escape'
+    ) {
+
+      const modal =
+        document.getElementById(
+          'terminalResetModal'
+        );
+
+
+      if (
+        modal &&
+        modal.classList.contains(
+          'show'
+        )
+      ) {
+
+        closeTerminalResetModal();
+
+      }
+
+    }
+
+  }
+);
   // ==================================================
   // JAM & TANGGAL
   // ==================================================
