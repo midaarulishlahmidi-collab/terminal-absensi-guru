@@ -787,6 +787,166 @@ input:focus {
 
 }
 
+    /* ==================================================
+   CAMERA STATUS CHIP
+   ================================================== */
+
+.server-status {
+  width: fit-content;
+  max-width: 100%;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 12px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    999px;
+
+  background:
+    var(--surface-soft);
+
+  color:
+    var(--muted);
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.4px;
+
+  text-transform:
+    uppercase;
+}
+
+
+.camera-status-dot {
+  width:
+    8px;
+
+  height:
+    8px;
+
+  flex:
+    0 0 8px;
+
+  border-radius:
+    50%;
+}
+
+
+/* MENYIAPKAN */
+
+.server-status.status-preparing {
+  color:
+    var(--warning);
+
+  background:
+    rgba(215, 160, 44, 0.10);
+
+  border-color:
+    rgba(215, 160, 44, 0.25);
+}
+
+.server-status.status-preparing
+.camera-status-dot {
+  background:
+    var(--warning);
+
+  box-shadow:
+    0 0 0 5px
+    rgba(215, 160, 44, 0.12);
+
+  animation:
+    terminalStatusPulse
+    1.2s ease-in-out
+    infinite;
+}
+
+
+/* ONLINE */
+
+.server-status.status-online {
+  color:
+    var(--success);
+
+  background:
+    rgba(43, 165, 101, 0.10);
+
+  border-color:
+    rgba(43, 165, 101, 0.25);
+}
+
+.server-status.status-online
+.camera-status-dot {
+  background:
+    var(--success);
+
+  box-shadow:
+    0 0 0 5px
+    rgba(43, 165, 101, 0.12);
+}
+
+
+/* ERROR */
+
+.server-status.status-error {
+  color:
+    var(--danger);
+
+  background:
+    rgba(211, 77, 77, 0.10);
+
+  border-color:
+    rgba(211, 77, 77, 0.25);
+}
+
+.server-status.status-error
+.camera-status-dot {
+  background:
+    var(--danger);
+
+  box-shadow:
+    0 0 0 5px
+    rgba(211, 77, 77, 0.12);
+}
+
+
+@keyframes terminalStatusPulse {
+
+  0%,
+  100% {
+    opacity:
+      1;
+  }
+
+  50% {
+    opacity:
+      0.45;
+  }
+
+}
+
   </style>
 
 </head>
@@ -954,14 +1114,18 @@ input:focus {
 
         </div>
 
-
         <div
           id="cameraStatus"
-          class="server-status"
+          class="server-status status-preparing"
         >
-          Menyiapkan kamera...
+          <span
+            class="camera-status-dot"
+          ></span>
+        
+          <span id="cameraStatusText">
+            MENYIAPKAN KAMERA
+          </span>
         </div>
-
 
         <button
           id="resetBtn"
@@ -1525,6 +1689,52 @@ initTerminalTheme();
 
   }
 
+  // ==================================================
+// CAMERA STATUS
+// ==================================================
+
+function setCameraStatus(
+  type,
+  text
+) {
+
+  const statusBox =
+    document.getElementById(
+      'cameraStatus'
+    );
+
+
+  const statusText =
+    document.getElementById(
+      'cameraStatusText'
+    );
+
+
+  if (
+    !statusBox ||
+    !statusText
+  ) {
+    return;
+  }
+
+  const safeType =
+    [
+      'preparing',
+      'online',
+      'error'
+    ].includes(type)
+
+      ? type
+      : 'preparing';
+
+  statusBox.className =
+    'server-status status-' +
+    safeType;
+
+  statusText.textContent =
+    text ||
+    'MENYIAPKAN KAMERA';
+}
 
   // ==================================================
   // START CAMERA
@@ -1535,19 +1745,27 @@ initTerminalTheme();
     if (scannerStarted) {
       return;
     }
-
+    
+    setCameraStatus(
+      'preparing',
+      'MENYIAPKAN KAMERA'
+    );
 
     if (
       typeof Html5QrcodeScanner ===
       'undefined'
     ) {
 
+      setCameraStatus(
+        'error',
+        'KAMERA ERROR'
+      );
+
       showError(
         'Library scanner QR gagal dimuat. Periksa koneksi internet.'
       );
 
       return;
-
     }
 
 
@@ -1597,21 +1815,15 @@ initTerminalTheme();
 
         // Error pembacaan setiap frame
         // sengaja tidak ditampilkan.
-
       }
-
     );
 
-
-    document
-      .getElementById(
-        'cameraStatus'
-      )
-      .textContent =
-        'Scanner aktif. Jika browser meminta izin kamera, pilih Izinkan.';
+      setCameraStatus(
+        'online',
+        'KAMERA ONLINE'
+      );
 
   }
-
 
   // ==================================================
   // QR BERHASIL DIBACA
