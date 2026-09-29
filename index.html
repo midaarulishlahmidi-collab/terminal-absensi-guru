@@ -808,6 +808,21 @@ input:focus {
       TERMINAL ABSENSI MENGAJAR GURU
     </p>
 
+    <button
+      id="terminalThemeToggle"
+      class="terminal-theme-toggle"
+      type="button"
+      title="Ganti mode terang / gelap"
+    >
+      <span id="terminalThemeIcon">
+        🌙
+      </span>
+    
+      <span id="terminalThemeText">
+        Mode Gelap
+      </span>
+    </button>
+
   </div>
 
 
@@ -1005,6 +1020,131 @@ input:focus {
 
   let PROJECT_REF = '';
   let TERMINAL_TOKEN = '';
+
+  // ==================================================
+// TERMINAL THEME
+// ==================================================
+
+function applyTerminalTheme(
+  theme
+) {
+
+  const safeTheme =
+    theme === 'dark'
+      ? 'dark'
+      : 'light';
+
+
+  document.documentElement
+    .setAttribute(
+      'data-theme',
+      safeTheme
+    );
+
+
+  localStorage.setItem(
+    'terminal_theme',
+    safeTheme
+  );
+
+
+  const icon =
+    document.getElementById(
+      'terminalThemeIcon'
+    );
+
+
+  const text =
+    document.getElementById(
+      'terminalThemeText'
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      safeTheme === 'dark'
+        ? '☀️'
+        : '🌙';
+
+  }
+
+
+  if (text) {
+
+    text.textContent =
+      safeTheme === 'dark'
+        ? 'Mode Terang'
+        : 'Mode Gelap';
+
+  }
+
+}
+
+
+function initTerminalTheme() {
+
+  const savedTheme =
+    localStorage.getItem(
+      'terminal_theme'
+    );
+
+
+  if (
+    savedTheme === 'dark' ||
+    savedTheme === 'light'
+  ) {
+
+    applyTerminalTheme(
+      savedTheme
+    );
+
+    return;
+
+  }
+
+
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+
+
+  applyTerminalTheme(
+    prefersDark
+      ? 'dark'
+      : 'light'
+  );
+
+}
+
+
+document
+  .getElementById(
+    'terminalThemeToggle'
+  )
+  .addEventListener(
+    'click',
+    function() {
+
+      const current =
+        document.documentElement
+          .getAttribute(
+            'data-theme'
+          );
+
+
+      applyTerminalTheme(
+        current === 'dark'
+          ? 'light'
+          : 'dark'
+      );
+
+    }
+  );
+
+initTerminalTheme();
 
   let scanLocked = false;
 
