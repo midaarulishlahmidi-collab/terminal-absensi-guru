@@ -1395,6 +1395,61 @@ function showResult(data) {
     return;
   }
 
+  // ----------------------------------------------
+// BELUM WAKTUNYA KELUAR MENGAJAR
+// ----------------------------------------------
+
+if (
+  data.terminal_action ===
+    'check_out_rejected' &&
+  String(
+    data.message || ''
+  ).startsWith(
+    'Belum dapat keluar mengajar'
+  )
+) {
+
+  const result =
+    document.getElementById(
+      'result'
+    );
+
+
+  result.className =
+    'warning';
+
+
+  result.innerHTML = `
+
+    <div class="icon">
+      ⏳
+    </div>
+
+    <div class="result-title">
+      BELUM WAKTUNYA KELUAR
+    </div>
+
+    <div class="details">
+
+      ${escapeHtml(
+        data.message ||
+        'Jadwal mengajar masih berlangsung.'
+      )}
+
+    </div>
+
+  `;
+
+
+  speak(
+    'Belum waktunya keluar mengajar.'
+  );
+
+
+  return;
+
+}
+
     // ----------------------------------------------
   // MASUK / KELUAR MENGAJAR
   // ----------------------------------------------
