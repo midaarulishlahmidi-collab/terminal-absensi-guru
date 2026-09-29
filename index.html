@@ -1657,6 +1657,270 @@ html[data-theme="dark"]
 
 }
 
+    /* ==================================================
+   TERMINAL OPERATIONS HEADER
+   ================================================== */
+
+.terminal-ops-header {
+  min-height:
+    142px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  padding:
+    22px 24px;
+
+  text-align:
+    left;
+
+  overflow:
+    hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--surface),
+      var(--surface-soft)
+    );
+}
+
+
+/* BAGIAN IDENTITAS */
+
+.terminal-ops-left {
+  min-width:
+    0;
+
+  flex:
+    1 1 auto;
+}
+
+
+.terminal-ops-kicker {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  margin-bottom:
+    10px;
+
+  color:
+    var(--primary);
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    1.25px;
+}
+
+
+/* TITIK STATUS */
+
+.terminal-ops-dot {
+  width:
+    9px;
+
+  height:
+    9px;
+
+  flex:
+    0 0 9px;
+
+  border-radius:
+    50%;
+
+  background:
+    var(--success);
+
+  box-shadow:
+    0 0 0 6px
+    rgba(43, 165, 101, 0.10);
+}
+
+
+/* NAMA TERMINAL */
+
+.terminal-device-name {
+  margin:
+    0;
+
+  color:
+    var(--text) !important;
+
+  font-size:
+    clamp(
+      24px,
+      2.4vw,
+      34px
+    );
+
+  line-height:
+    1.12;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    -0.7px;
+}
+
+
+.terminal-ops-subtitle {
+  margin-top:
+    7px;
+
+  color:
+    var(--muted);
+
+  font-size:
+    13px;
+
+  font-weight:
+    600;
+}
+
+
+/* BLOK JAM */
+
+.terminal-clock-card {
+  flex:
+    0 0 auto;
+
+  min-width:
+    245px;
+
+  padding:
+    16px 20px;
+
+  text-align:
+    right;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    17px;
+
+  background:
+    var(--surface);
+
+  box-shadow:
+    0 8px 25px
+    rgba(18, 55, 41, 0.07);
+}
+
+
+.terminal-clock-card #clock {
+  margin:
+    0;
+
+  color:
+    var(--primary);
+
+  font-size:
+    clamp(
+      36px,
+      4vw,
+      50px
+    );
+
+  line-height:
+    1;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    -2px;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+
+.terminal-clock-card #date {
+  margin-top:
+    7px;
+
+  color:
+    var(--muted);
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+
+  line-height:
+    1.4;
+}
+
+
+/* DARK MODE */
+
+html[data-theme="dark"]
+.terminal-clock-card {
+  box-shadow:
+    0 10px 28px
+    rgba(0, 0, 0, 0.22);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+  .terminal-ops-header {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    padding:
+      19px;
+  }
+
+
+  .terminal-clock-card {
+    min-width:
+      0;
+
+    width:
+      100%;
+
+    text-align:
+      left;
+  }
+
+
+  .terminal-device-name {
+    font-size:
+      25px;
+  }
+
+}
+
   </style>
 
 </head>
@@ -1775,25 +2039,49 @@ html[data-theme="dark"]
 
     <!-- JAM -->
 
-    <div class="clock-area">
+<div class="clock-area terminal-ops-header">
 
-      <div id="clock">
-        --:--:--
-      </div>
+  <div class="terminal-ops-left">
 
-      <div id="date">
-        Memuat tanggal...
-      </div>
+    <div class="terminal-ops-kicker">
 
-      <div
-        id="terminalInfo"
-        class="terminal-name"
-      >
-        Terminal Ruang Guru
-      </div>
+      <span class="terminal-ops-dot"></span>
+
+      TERMINAL OPERASIONAL
 
     </div>
 
+
+    <div
+      id="terminalInfo"
+      class="terminal-name terminal-device-name"
+    >
+      Terminal Ruang Guru
+    </div>
+
+
+    <div class="terminal-ops-subtitle">
+      MIS Daarul Ishlah
+      ·
+      Absensi Mengajar Guru
+    </div>
+
+  </div>
+
+
+  <div class="terminal-clock-card">
+
+    <div id="clock">
+      --:--:--
+    </div>
+
+    <div id="date">
+      Memuat tanggal...
+    </div>
+
+  </div>
+
+</div>
 
     <div class="grid">
 
