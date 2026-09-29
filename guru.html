@@ -882,21 +882,25 @@ function requestTeacherPin() {
       );
 
 
-      function cleanup() {
+function cleanup() {
 
-        modal.style.display =
-          'none';
+  // Hapus PIN dari kolom setelah selesai digunakan
+  input.value =
+    '';
 
-        submitButton.onclick =
-          null;
+  modal.style.display =
+    'none';
 
-        cancelButton.onclick =
-          null;
+  submitButton.onclick =
+    null;
 
-        input.onkeydown =
-          null;
+  cancelButton.onclick =
+    null;
 
-      }
+  input.onkeydown =
+    null;
+
+}
 
 
       function submitPin() {
