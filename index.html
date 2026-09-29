@@ -1921,6 +1921,107 @@ html[data-theme="dark"]
 
 }
 
+    /* ==================================================
+   TERMINAL MAINTENANCE
+   ================================================== */
+
+.terminal-maintenance {
+  margin-top:
+    18px;
+
+  padding-top:
+    15px;
+
+  border-top:
+    1px solid
+    var(--border);
+
+  text-align:
+    center;
+}
+
+
+.terminal-reset-button {
+  min-height:
+    40px;
+
+  padding:
+    8px 13px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--muted);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    11px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    750;
+
+  box-shadow:
+    none;
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+
+.terminal-reset-button:hover {
+  background:
+    rgba(211, 77, 77, 0.07);
+
+  color:
+    var(--danger);
+
+  border-color:
+    rgba(211, 77, 77, 0.28);
+}
+
+
+.terminal-reset-icon {
+  font-size:
+    14px;
+}
+
+
+.terminal-maintenance-note {
+  margin-top:
+    7px;
+
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+
+  line-height:
+    1.4;
+}
+
   </style>
 
 </head>
@@ -2134,13 +2235,28 @@ html[data-theme="dark"]
           </span>
         </div>
 
-        <button
-          id="resetBtn"
-          class="secondary-button"
-          type="button"
-        >
-          Reset Pengaturan Terminal
-        </button>
+        <div class="terminal-maintenance">
+        
+          <button
+            id="resetBtn"
+            class="terminal-reset-button"
+            type="button"
+            title="Reset konfigurasi terminal"
+          >
+            <span class="terminal-reset-icon">
+              ⚙️
+            </span>
+        
+            <span>
+              Pengaturan Terminal
+            </span>
+          </button>
+        
+          <div class="terminal-maintenance-note">
+            Gunakan hanya jika terminal perlu dikonfigurasi ulang.
+          </div>
+        
+        </div>
 
       </div>
 
