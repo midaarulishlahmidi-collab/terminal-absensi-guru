@@ -1025,8 +1025,9 @@ input:focus {
   border-radius:
     16px;
 
-  transform: none !important;
-  -webkit-transform: none !important;
+  /* BALIK PREVIEW AGAR TIDAK MIRROR */
+  transform: scaleX(-1) !important;
+  -webkit-transform: scaleX(-1) !important;
 }
 
 
